@@ -8,10 +8,10 @@ server <- function(input, output, session) {
 
         #오늘의 추천음식점 출력
         food_rec_Server("food_rec")
+        week_his_Server("week_his")
         res_his_Server("res_his")
+        
 
-
-  
 }
 
 

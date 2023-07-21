@@ -21,6 +21,11 @@ home_UI <- function(id){
             tags$div(
                 tags$h4("이번주의 식사기록", style = "margin-left: 10px;")
             ),
+            tags$div(style = "margin-left: 10px; margin-bottom: 5px; border:1px solid black;",
+                tags$span(style = "margin-top: 0px;",
+                    week_his_UI("week_his")
+                )
+            ),
             tags$span(
                 class = "space"
             ),

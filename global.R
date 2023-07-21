@@ -10,7 +10,7 @@ library(data.table)
 library(jsonlite)
 library(rjson)
 library(bslib)
-
+library(lubridate)
 
 # ------------------------------------------------------------------------------------------------ #
 # mysql connect                                                                                    #
@@ -96,6 +96,14 @@ addNewFile <- function(wrap_id, i){
         where = "beforeEnd",
         ui = newFileUI
       )
+}
+
+# DB res table 의 메뉴 벡터화 ------------------------------------------------------------------------- #
+
+menuToList <- function(table){
+    menu_list <- lapply(table$menu , fromJSON) #menu json형태 list화
+    rec_menu_str <- lapply(menu_list , names)  #메뉴만 추출
+    return(rec_menu_str)
 }
 
 

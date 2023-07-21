@@ -136,21 +136,8 @@ food_rec_Server <- function(id){
 
             ## later: add try-catch
 
-
-            
-
             # recommended way: write a script algorithimcally
 
-
-            
-
-
-            
-
-
-            
         })
-
-        
     })
 }

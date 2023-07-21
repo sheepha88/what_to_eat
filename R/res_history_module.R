@@ -5,16 +5,14 @@ res_his_UI <- function(id){
     fluidPage(
         id = id,
         fluidRow(
-            
                 uiOutput(ns("rec_his_bar"))
-            
         )    
     )
 }
 
 
 # server ----------------------------------------------------------------------------------------- #
-res_his_Server <- function(id, medium){
+res_his_Server <- function(id){
     moduleServer(id , function(input , output , session){
         ns <- session$ns
 
@@ -41,13 +39,19 @@ res_his_Server <- function(id, medium){
                     rec_menu_str <- names(menu_list) |> paste(collapse = ",") #메뉴만 추출
                 df_res_his$menu <-rec_menu_str
                 df <<- rbind(df , df_res_his)
-            
 
+                #추천음식점 기록 개수 제어 변수
+                control_num <- 7L
+                if(nrow(df)>control_num){
+                    df<-tail(df , control_num)
+                }
+                
                 #동적으로 
                 output$rec_his_bar <- renderUI({
-                    #역순으로 출력
-                    tags <- lapply(seq(count(), 1, -1), function(i) {
-                        tags$div(id = paste0("bar_",i),
+                    #역순으로 최대 7개 까지만 출력
+                    count_seq <- rev(seq_len(min(count(), control_num)))
+                    tags <- lapply(count_seq, function(i) {
+                        tags$div(class = "dynamic-div",
                                 style = "border: 1px solid black; border-radius: 10px; 
                                 background-color: #2F5597; padding: 10px; 
                                 margin-top: 15px; margin-bottom: 15px; margin-left: 10px; margin-right: 10px;",
@@ -56,9 +60,13 @@ res_his_Server <- function(id, medium){
                                 paste("•    ",  df[i,"res_name"] ," / ", df[i,"category"] , "/" , df[i,"menu"] )
                             )
                         )
+                    
+                    #div를 5개로 제한해서 show하는 코드 -> 시도중
+                    # shinyjs::runjs("'.dynamic-div').hide()")
+                    # shinyjs::runjs("'.dynamic-div div:nth-child(3)').show()")
                     })
                 })
-            }   
+            }  
         })
     })
 }
