@@ -10,14 +10,10 @@ week_his_UI <- function(id){
 }
 
 
-
-
 # server ----------------------------------------------------------------------------------------- #
 week_his_Server <- function(id){
     moduleServer(id , function(input , output , session){
         ns <- session$ns
-
-
         #review table 출력
 
         ##오늘 날짜가 포함된 주의 날짜들을 출력
@@ -40,43 +36,46 @@ week_his_Server <- function(id){
         )
         
         df_reivew <- dbGetQuery(con , sql_review_table) |> data.table()
-
-        
         df_reivew$menu <- sapply(menuToList(table = df_reivew) , function(x){paste(x , collapse = ",")})
-        print(df_reivew)
-        
 
+        
 
         #이번주의 식사기록 df_review 이용
         output$week_his_bar <- renderUI({
-            #역순으로 최대 7개 까지만 출력
-            count_seq <- rev(seq(nrow(df_reivew)))
-            tags <- lapply(count_seq, function(i) {
-                tags$div(class = "dynamic-div",
-                        style = "border: 1px solid black; border-radius: 10px; 
-                        background-color: #4574C4; padding: 10px; 
-                        margin-top: 15px; margin-bottom: 15px; margin-left: 10px; margin-right: 10px;",
-                    tags$span(
-                        style = "color: white;",
-                        paste(
-                            "•    ",  df_reivew[i,"date_visit"] ," : ", df_reivew[i,"res_name"] ,
-                             "/" , df_reivew[i,"menu"] 
-                        ),
-                        tags$br(),
-                        "참석자 : " , df_reivew[i,"participants"]
+            # 오늘날짜애 대한 그 주의 기록이 있다면 출력
+            ##역순으로 최대 7개 까지만 출력
+            if(nrow(df_reivew)!=0L){
+                count_seq <- rev(seq(nrow(df_reivew)))
+                tags <- lapply(count_seq, function(i) {
+                    tags$div(class = "dynamic-div",
+                            style = "border: 1px solid black; border-radius: 10px; 
+                            background-color: #4574C4; padding: 10px; 
+                            margin-top: 15px; margin-bottom: 15px; margin-left: 10px; margin-right: 10px;",
+                        tags$span(
+                            style = "color: white;",
+                            paste(
+                                "•    ",  df_reivew[i,"date_visit"] ," : ", df_reivew[i,"res_name"] ,
+                                "/" , df_reivew[i,"menu"] 
+                            ),
+                            tags$br(),
+                            "참석자 : " , df_reivew[i,"participants"]
+                        )
                     )
+                })
+            }else{
+                # 오늘날짜애 대한 그 주의 기록이 없다면 "기록없음" 출력
+                tags$div(class = "dynamic-div",
+                            style = "border: 1px solid black; border-radius: 10px; 
+                            background-color: #4574C4; padding: 10px; 
+                            margin-top: 15px; margin-bottom: 15px; margin-left: 10px; margin-right: 10px;",
+                        tags$span(
+                            style = "color: white;",
+                            paste(
+                                "•    ","식사가록이 없습니다."
+                            ),
+                        )
                 )
-            })
+            }
         })
-
-        
-
-        
-
-
-
-
-
-
     })
 }

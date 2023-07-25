@@ -6,6 +6,11 @@ server <- function(input, output, session) {
                 session$userData[["user_id"]] <- 1L # needs to be updated
         })
 
+        # 미래구조
+        # db_table <- dataModule_Server("data_module", trigger) trogger = 로그인했을때
+        # module_1("module1", db_table)
+        # module_2("module2", db_table)
+
         #오늘의 추천음식점 출력
         food_rec_Server("food_rec")
         week_his_Server("week_his")

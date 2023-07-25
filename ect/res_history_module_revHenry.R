@@ -51,22 +51,47 @@ res_his_Server <- function(id){
                     #역순으로 최대 7개 까지만 출력
                     count_seq <- rev(seq_len(min(count(), control_num)))
                     tags <- lapply(count_seq, function(i) {
-                        tags$div(class = "dynamic-div",
-                                style = "border: 1px solid black; border-radius: 10px; 
-                                background-color: #2F5597; padding: 10px; 
-                                margin-top: 15px; margin-bottom: 15px; margin-left: 10px; margin-right: 10px;",
-                            tags$span(
-                                style = "color: white;",
-                                paste("•    ",  df[i,"res_name"] ," / ", df[i,"category"] , "/" , df[i,"menu"] )
+
+                        if (i > 2L){
+                            tags$div(class = "dynamic-div",
+                                    style = "border: 1px solid black; border-radius: 10px; 
+                                    background-color: #2F5597; padding: 10px; 
+                                    margin-top: 15px; margin-bottom: 15px; margin-left: 10px; margin-right: 10px;",
+                                tags$span(
+                                    style = "color: white;",
+                                    paste("•    ",  df[i,"res_name"] ," / ", df[i,"category"] , "/" , df[i,"menu"] )
+                                )
                             )
-                        )
+                        }else{
+                            tags$div(class = "dynamic-div sr-only",
+                                    style = "border: 1px solid black; border-radius: 10px; 
+                                    background-color: #2F5597; padding: 10px; 
+                                    margin-top: 15px; margin-bottom: 15px; margin-left: 10px; margin-right: 10px;",
+                                tags$span(
+                                    style = "color: white;",
+                                    paste("•    ",  df[i,"res_name"] ," / ", df[i,"category"] , "/" , df[i,"menu"] )
+                                )
+                            )
+                        }
+
+
+
                     
                     #div를 5개로 제한해서 show하는 코드 -> 시도중
                     # shinyjs::runjs("'.dynamic-div').hide()")
                     # shinyjs::runjs("'.dynamic-div div:nth-child(3)').show()")
                     })
+
+                    
+                    
+                    tags
+
                 })
+
+                
             }
+
+            
         })
     })
 }

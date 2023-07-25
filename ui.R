@@ -1,5 +1,7 @@
 ui <- fluidPage(
   useShinyjs(),
+  includeScript("www/custom.js"),
+
   
   #HTML function 지정
     tags$head(tags$script(type = "text/javascript", 
@@ -9,6 +11,8 @@ ui <- fluidPage(
         
         ;}"))
     ),
+
+#    tags$head(tags$script(src="custom.js")),
 
 
     tags$style(
@@ -53,17 +57,21 @@ ui <- fluidPage(
                 height: auto;
                 display: inline-block;
             }
+            .part_line {
+                border-top: 1px solid #E8EBEE; 
+                padding-top: 5px;
+            }
         ")
     ),
 
     fluidRow(
-        tags$header(
+        tags$div(
             tags$h1(
                 "What to eat",
                 class = "custom-font",
                 actionButton("showNavbarButton","" , style = "float: left; background-color: #00BFE5;"  , class = "my-button" , icon = icon("bars", class = "my-icon") ),  
             ),
-            tags$div(
+            tags$div(style = "background-color : #FAFBFC;",
                 navbarPage(
                     id = "navbarPage",
                     title = "What to eat",
@@ -72,16 +80,18 @@ ui <- fluidPage(
                     tabPanel("Home",
                         home_UI("Home")
                     ),
-                    tabPanel("음식점 검색"),
+                    tabPanel("음식점 검색",
+                        search_UI("Search")
+                    ),
                     tabPanel("평점 & 리뷰작성")
                 ),
                 class = "navbar_class",
                 # style="display: none"
             )
         )
+        
     )
 )
-
 
 
     

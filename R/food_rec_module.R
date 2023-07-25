@@ -26,7 +26,7 @@ food_rec_UI <- function(id){
                 class = "space"
             ),
             tags$span(
-                tags$h4("신선푸드 자세히보기")
+                tags$h4("신선푸드 자세히보기" , style = "font-size:15px; margin-left: 10px;")
             )
         )
     )
@@ -64,7 +64,7 @@ food_rec_Server <- function(id){
             # 추천음식점의 카테고리 출력
             rec_category <- df_res_row$category
             output$res_category <- renderUI({
-                tags$h4("카테고리 : ", rec_category)
+                tags$h4("카테고리 : ", rec_category , style = "margin-left: 10px; font-size:15px;")
             })
 
             # 추천음식점의 메뉴 출력
@@ -73,7 +73,7 @@ food_rec_Server <- function(id){
             rec_menu_str <- names(menu_list) |> paste(collapse = ",")
             print(rec_menu_str)
             output$rec_menu <- renderUI({
-                tags$h4("메뉴 : ", rec_menu_str)
+                tags$h4("메뉴 : ", rec_menu_str , style = "font-size:15px; margin-left: 10px;")
             })
 
             #음식점 이름 , 카테고리 , 메뉴 반환
