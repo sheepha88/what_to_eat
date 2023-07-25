@@ -36,7 +36,7 @@ week_his_Server <- function(id){
         )
         
         df_reivew <- dbGetQuery(con , sql_review_table) |> data.table()
-        df_reivew$menu <- sapply(menuToList(table = df_reivew) , function(x){paste(x , collapse = ",")})
+        df_reivew$menu <- unlist(menuToList(table = df_reivew))
 
         
 

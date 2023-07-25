@@ -107,3 +107,34 @@ menuToList <- function(table){
 }
 
 
+
+
+# db table가져오기 ----------------------------------------------------------------------------------- 기
+getDBTable<-function(){
+    print("sdfsdfsdg")
+    # 음식점  테이블 출력
+    sql_res <- "select * from res;"
+    df_res <- dbGetQuery(con, sql_res) |> data.table()
+    
+    # 사용자 테이블 출력
+    sql_user <- "select * from user;"
+    df_user <- dbGetQuery(con, sql_user) |> data.table()
+    
+    # review 테이블 출력
+    sql_review <- "select * from review;"
+    df_review <- dbGetQuery(con, sql_review) |> data.table()
+
+    # recommend 테이블 출력
+    sql_recommend <- "select * from recommend;"
+    df_recommend <- dbGetQuery(con, sql_recommend) |> data.table()
+
+    # image 테이블 출력
+    sql_image <- "select * from image;"
+    df_image <- dbGetQuery(con, sql_image) |> data.table()
+
+    #음식점 이름 , 카테고리 , 메뉴 반환
+    return(
+        list(res = df_res , user = df_user , review = df_review , recommend = df_recommend , image = df_image)
+    )
+}
+

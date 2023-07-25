@@ -1,6 +1,4 @@
 # UI --------------------------------------------------------------------------------------------- #
-
-
 search_UI <- function(id){
     ns <- NS(id)
     fluidPage(
@@ -12,7 +10,7 @@ search_UI <- function(id){
                     class = "part_line",
                     tags$h4(
                         "음식점 명", style = "margin-left: 10px; margin-bottom: 0px; " , 
-                        textInput(inputId = "name" , label = NULL , width = "95%")
+                        uiOutput(ns("name"))
                     )
                 ),
                 tags$div(
@@ -32,7 +30,7 @@ search_UI <- function(id){
                     class = "part_line",
                     tags$h4(
                         "메뉴", style = "margin-left: 10px; margin-bottom: 0px;",
-                        textInput(inputId = "menu" , label = NULL, width = "95%")    
+                        uiOutput(ns("menu")) 
                     )
                 ),
                 tags$div(
@@ -71,5 +69,43 @@ search_UI <- function(id){
 }
 
 
-
 # server ----------------------------------------------------------------------------------------- #
+search_Server <- function(id){
+    moduleServer(id , function(input , output , session){
+        ns <- session$ns
+
+        #dbtable 가져오기
+        dbTable <- session$userData[["dbTable"]]
+
+        #db table 중 res table에서 음식점 이름 가져오기
+        res_name_choices <- dbTable$res$res_name
+
+        #db table 중 res table에서 메뉴 가져와서 json 형태로 변환 후 vector로 변환
+        res_menu <- unlist(menuToList(dbTable$res))
+        
+        #음식점 검색
+        output$name <- renderUI({
+            selectInput(
+                inputId = "name" , 
+                label = NULL , 
+                width = "95%",
+                choices = res_name_choices,
+                selected = NULL,
+                multiple = TRUE
+            )
+        })
+
+        #메뉴 검색
+        output$menu <- renderUI({
+            selectInput(
+                inputId = "menu" , 
+                label = NULL , 
+                width = "95%",
+                choices = res_menu,
+                selected = NULL,
+                multiple = TRUE
+            )
+        })
+
+    })
+}
