@@ -13,10 +13,17 @@ server <- function(input, output, session) {
         # module_2("module2", db_table)
         
         
-        #오늘의 추천음식점 출력
+
+
+        #HOME tab_server
         food_rec_Server("food_rec")
         week_his_Server("week_his")
         res_his_Server("res_his")
+
+
+        #음식점 검색 tab_server
+        search_Server("Search")
+        
 
 }
 
