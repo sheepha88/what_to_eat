@@ -11,6 +11,8 @@ library(jsonlite)
 library(rjson)
 library(bslib)
 library(lubridate)
+library(dplyr)
+library(DT)
 
 # ------------------------------------------------------------------------------------------------ #
 # mysql connect                                                                                    #
@@ -44,7 +46,7 @@ dbExecute(con, "SET SQL_SAFE_UPDATES = 0;") # allowing update
 onStop(function() {
   cat("Closing App & Database Connection\n")
   #추후삭제 예정
-  dbExecute(con, "DELETE FROM testdb.recommend")
+  # dbExecute(con, "DELETE FROM testdb.recommend")
   dbDisconnect(con)
   # poolClose(con)
 })
@@ -98,7 +100,14 @@ addNewFile <- function(wrap_id, i){
       )
 }
 
-# DB res table 의 메뉴 벡터화 ------------------------------------------------------------------------- #
+# DB res table 의 메뉴  , 가격 벡터화 ------------------------------------------------------------------------- #
+
+menuToList <- function(table){
+    menu_list <- lapply(table$menu , fromJSON) #menu json형태 list화
+    rec_menu_str <- lapply(menu_list , names)  #메뉴만 추출
+    return(rec_menu_str)
+}
+
 
 menuToList <- function(table){
     menu_list <- lapply(table$menu , fromJSON) #menu json형태 list화
@@ -111,7 +120,6 @@ menuToList <- function(table){
 
 # db table가져오기 ----------------------------------------------------------------------------------- 기
 getDBTable<-function(){
-    print("sdfsdfsdg")
     # 음식점  테이블 출력
     sql_res <- "select * from res;"
     df_res <- dbGetQuery(con, sql_res) |> data.table()
@@ -119,6 +127,7 @@ getDBTable<-function(){
     # 사용자 테이블 출력
     sql_user <- "select * from user;"
     df_user <- dbGetQuery(con, sql_user) |> data.table()
+
     
     # review 테이블 출력
     sql_review <- "select * from review;"

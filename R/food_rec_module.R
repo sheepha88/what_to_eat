@@ -45,7 +45,7 @@ food_rec_Server <- function(id){
             # 음식점 정보 랜덤으로 테이블 출력 (연속 중복 X)
             sql_1 <- "select * from res;"
             df_res <- dbGetQuery(con, sql_1) |> data.table()
-            random_num <- sample(df_res$id, 1 , replace = FALSE) |> as.integer()
+            random_num <- sample(df_res$id, 1 , replace = FALSE) |> as.integer() 
             print(random_num)
 
             # 랜덤으로 출력된 Id에 해당하는 restaurant 테이블 출력
@@ -96,7 +96,14 @@ food_rec_Server <- function(id){
 
 
             # step3: send query to MySQL
+            # recommend테이블에 아무것도 없을때
+            ##dbtable 가져오기
+            dbTable <- session$userData[["dbTable"]]
+
+            ##db table 중 res table에서 음식점 이름 가져오기
             dbExecute(con, sql_script)
+           
+            
 
         # 새로고침 버튼 클릭 시, 출력 ----------------------------------------------------------------------- 
         observeEvent(input$refreshButton,{
