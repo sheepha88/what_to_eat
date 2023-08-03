@@ -62,7 +62,7 @@ search_UI <- function(id){
                         tags$div(style = "font-size : 13px;",
                         checkboxGroupInput(inputId = ns("score"), label = NULL ,  choices = c("TI" , "네이버") , inline=TRUE , selected = NULL )
                         ),
-                    sliderInput(inputId = ns("score_range") , label = NULL , min = 0L , max = 5L , value=0L , step = 0.5L, width = "95%")    
+                    sliderInput(inputId = ns("score_range") , label = NULL , min = 0L , max = 5L , value=c(0L,0L) , step = 0.5L, width = "95%")    
                     )
                 ),
                 tags$div(
@@ -135,81 +135,64 @@ search_Server <- function(id){
         
         #검색결과 조회
         observeEvent(input$Done_search,{
+
+            #데이터프레임 선언
+            df_res <- dbTable$res
+
+            #df_res의 메뉴컬럼 -> 메뉴 , 가격(평균)으로 만들기
+            ##메뉴 json -> 리스트
+            df_res$menu <- menuToList(dbTable$res) 
+            ##가격 json -> 리스트
+            df_res$price <- priceToList(dbTable$res)
             
-            
-            #입력값 모음 - 값없으면 아예 안나옴
-            
-            # print(input$name , input$category , input$menu , 
-            # input$price_range , input$distance_range)
-            print(dbTable$res$res_name)
-            print(input$menu)
-            print(is.vector(input$menu))
-            new_menu <- menuToList(dbTable$res)
-            print(new_menu)
-            print((menuToList(dbTable$res))[[1]])
-            print(is.vector(menuToList(dbTable$res)))
-            
-            
+            df_result <- df_res%>% filter(
+                                    ifelse(is.null(input$name) , TRUE , FALSE) | res_name %in% input$name
+                                    )%>%
+                                filter(
+                                    ifelse(is.null(input$category) , TRUE , FALSE) | category %in% input$category
+                                    )%>%
 
-
-
-
-
-
-
-            df_result <- dbTable$res %>%
-                #menu json -> vector
-                mutate(new_menu = menuToList(dbTable$res))%>%
-                    #음식점이름 입력값 포함하는 행 출력
-                    
-                    filter(res_name %in% input$name) %>%
-                        #카테고리 포함하는 행 출력
-                        filter(category %in% input$category ) %>%
-
-
-
-                            # filter(new_menu  %in% input$menu)  %>%
-                            # filter(any(unlist(strsplit(new_menu , ",")) %in% input$menu) ) %>%
-
-                                # filter(price <= input$price_range ) %>%
-
-                                #     filter(distance <= input$distance_range ) %>%
-
-                                        #컬럼추출
-                                        select(res_name , category , new_menu  , distance)
-                       
-
-            print(df_result)
-            
-            
+                                #메뉴를 찾을때는 filter(grepl)사용
+                                #dataframe의 메뉴는 현재 "보쌈,김치찌개" 형식으로 되어있는 길이1개의 캐릭터로 구성
+                                #따라서 grepl을 통해 특정문자열을 포함하는 행을 찾는것으로 진행해야함    
+                                filter(
+                                    ifelse(is.null(input$menu) , TRUE , FALSE) | grepl(paste(input$menu, collapse = '|'), menu)
+                                    )%>% 
+                                filter(
+                                    ifelse(sum(input$score_range)==0L , TRUE , FALSE) | between(rating_naver , input$score_range[1L],input$score_range[2L])
+                                    )%>%
+                                filter(
+                                    ifelse(input$price_range==0L , TRUE , FALSE) | price < input$price_range
+                                    )%>%
+                                filter(
+                                    ifelse(input$distance_range==0L , TRUE , FALSE) | distance < input$distance_range
+                                    )%>%
+                                select(
+                                    res_name , category , menu , rating_naver , price , distance
+                                    )
+                            
 
             #DataFrame UI 출력
             ##출력되는 데이터프레임 컬럼이름
-            colums_names = c("음식점 이름" , "카테고리" , "메뉴"  ,"위치(m)" )
+            colums_names = c("음식점 이름" , "카테고리" , "메뉴"  ,"평점","가격" ,"위치(m)"  )
             output$table <- DT::renderDataTable(
                 DT::datatable(df_result, escape=FALSE, colnames = colums_names,
                   options = list(
-                    pageLength = 20, autoWidth = TRUE,
+                    pageLength = 20, Width = '500px',
                     columnDefs = list(
                                     list( targets = 1, width = '100px'),
                                     list( targets = 2, width = '80px'),
                                     list( targets = 3, width = '200px'),
-                                    
-                                    list( targets = 4, width = '50px')
+                                    list( targets = 4, width = '50px'),
+                                    list( targets = 5, width = '50px'),
+                                    list( targets = 6, width = '50px')
                                 ),
                     transpose = TRUE,
-                    scrollX = TRUE
+                    scrollX = TRUE,
+                    dom = "ftp"
                     
-                  ))
+                ))
             )
-
-
-
-
-
-        
         })
-
-        
     })
 }

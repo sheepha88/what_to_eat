@@ -109,11 +109,16 @@ menuToList <- function(table){
 }
 
 
-menuToList <- function(table){
-    menu_list <- lapply(table$menu , fromJSON) #menu json형태 list화
-    rec_menu_str <- lapply(menu_list , names)  #메뉴만 추출
-    return(rec_menu_str)
+priceToList <- function(table){
+    price_list <- lapply(table$menu , fromJSON) #menu json형태 list화
+    price_list_num <- lapply(price_list , as.numeric) 
+    price_list_mean <- lapply(price_list_num , mean) 
+    rec_price_str <- unname(price_list_mean)
+    
+    return(unlist(rec_price_str))
 }
+
+
 
 
 
