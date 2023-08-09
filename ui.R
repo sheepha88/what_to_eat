@@ -83,12 +83,22 @@ ui <- fluidPage(
                     tabPanel("음식점 검색",
                         search_UI("Search")
                     ),
-                    tabPanel("평점 & 리뷰작성")
+                    tabPanel(
+                        title = "평점 & 리뷰작성",
+                        value = "rating"
+                    )
                 ),
                 class = "navbar_class",
                 # style="display: none"
             )
-        )
+        ),
+
+        # [delete]
+        # actionButton(
+        #     inputId = "go_to_rating",
+        #     label = "Go to Rating Page",
+        #     class = "btn-danger"
+        # )
         
     )
 )

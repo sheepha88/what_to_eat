@@ -13,6 +13,7 @@ library(bslib)
 library(lubridate)
 library(dplyr)
 library(DT)
+library(shinyBS)
 
 # ------------------------------------------------------------------------------------------------ #
 # mysql connect                                                                                    #
@@ -152,3 +153,138 @@ getDBTable<-function(){
     )
 }
 
+
+
+# 자세히보기 modal ------------------------------------------------------------------------------------ #
+#리뷰개수 컬ㄹ럼 생성하는  함수
+df_review <- getDBTable()$review
+
+# modal
+
+modal_ui_file <- function(id , session ,  name, category, menu, rating_naver, price, distance, url){
+    ns <- NS(id)
+    modalDialog(
+        title = " Information",
+        tags$style(".modal-title { font-size: 30px; }"),
+        fluidPage(
+            fluidRow(
+                column(
+                    width = 12,
+                    tags$h4(name)
+                )
+            ),
+            fluidRow(
+                column(
+                    width = 12,
+                    tags$h4("카테고리 : ",category)
+                )
+            ),
+            fluidRow(
+                column(
+                    width = 12,
+                    tags$h4("메뉴 : ",menu)
+                )
+            ),      
+            fluidRow(
+                column(
+                    width = 12,
+                    tags$div(style = "display: flex;",
+                        tags$span(
+                            tags$h4("네이버 평점 : ",rating_naver)
+                            
+                        ),
+                        tags$span(style = "margin-left:3px; margin-top:11px;",
+                            tags$a(
+                                href = HTML(url),
+                                target = "_blank",
+                                "네이버 바로가기"
+                            )
+                        )
+                    )
+                )
+            ),      
+            fluidRow(
+                column(
+                    width = 12,
+                    tags$h4("가격(평균) : ",price)
+                )
+            ),      
+            fluidRow(
+                column(
+                    width = 12,
+                    tags$h4("위치(회사기준) : ",price)
+                )
+            ),            
+            fluidPage(sylte = "background-color : #FAFBFC;",
+                tags$h3(class = "part_line",
+                    "TI history"
+                ),
+                fluidRow(
+                    column(
+                        width = 10,
+                        tags$h4("평점(TI) : ")
+                    ),
+                    column(
+                        width = 2,
+                        tags$h4(
+                            actionLink(
+                                inputId = ns("go_review_rec"),
+                                label = "리뷰쓰기"
+                            )
+                        )
+
+                    )
+                ),
+                
+                fluidRow(
+                    column(
+                        width = 12,
+                        tags$h4("리뷰")
+                    )
+                ),
+                fluidPage(sylte = "background-color : #FAFBFC;",
+                    #리뷰수대로 생성해야함
+                    #함수사용
+                    column(
+                        width = 12,
+                        tags$div(class = "part_line",
+                            "dfs"
+                        )
+                    )
+                )
+            )
+
+        ),
+        size = "l",
+        easyClose = TRUE,
+        footer = tagList(
+            actionButton(
+                inputId = "yes_file",
+                label = "Yes",
+                class = "btn-primary",
+            ),
+        modalButton("Close")
+        )
+    )
+}
+
+
+# 리뷰쓰기 페이지 이동 함수 --------------------------------------------------------------------------------- 수
+go_review_ui <- function(id ){
+    ns <- NS(id)
+    actionLink(
+        inputId = ns("go_review"),
+        label = "리뷰쓰기"
+    )
+}
+
+go_review_server <- function(input , output ,session ){
+observeEvent(input$go_review ,{
+            updateTabsetPanel(
+                session = session,
+                inputId = "navbarPage",
+                selected = "rating"
+            )
+        })
+
+}

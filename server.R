@@ -5,6 +5,7 @@ server <- function(input, output, session) {
                 session$userData[["refreshClicked"]] <- reactiveVal(0L)
                 session$userData[["user_id"]] <- 1L # needs to be updated
                 session$userData[["dbTable"]] <- getDBTable() #Table 전부 다 가져오는 함수
+                
         })
 
         # 미래구조
@@ -16,14 +17,16 @@ server <- function(input, output, session) {
 
 
         #HOME tab_server
-        food_rec_Server("food_rec")
+        food_rec_Server("food_rec", parent = session)
         week_his_Server("week_his")
         res_his_Server("res_his")
 
 
         #음식점 검색 tab_server
         search_Server("Search")
-        
+
+
+       
 
 }
 

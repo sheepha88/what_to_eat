@@ -6,7 +6,7 @@ food_rec_UI <- function(id){
         id = id,
         fluidRow(
             tags$span(style = "text-align: center;",
-                uiOutput(ns("res_name_rec"))
+                uiOutput(ns("res_name"))
             ),
             tags$div(style = "text-align: center;",
                 actionButton(
@@ -26,40 +26,59 @@ food_rec_UI <- function(id){
                 class = "space"
             ),
             tags$span(
-                tags$h4("신선푸드 자세히보기" , style = "font-size:15px; margin-left: 10px;")
+                tags$h4( style = "font-size:15px; margin-left: 10px;" ,
+                    actionLink(inputId = ns("rec_modal") , label = "자세히보기")
+                )   
+            ),
+            tags$span(
+                tags$h4( style = "font-size:15px; margin-left: 10px;" ,
+                    go_review_ui(id)
+                )   
             )
+           
+            
+                
         )
     )
 }
 
 
 # server ----------------------------------------------------------------------------------------- #
-food_rec_Server <- function(id){
+##parent : main 서버의 session을 modal함수의 인자로 받을때 쓰기 위해
+food_rec_Server <- function(id, parent){
     moduleServer(id , function(input , output , session){
         ns <- session$ns
-
+        #modal
+        # modal_Server("Open_modal")
         
+        isolate({
+            resName <- reactiveVal("")
+
+            recommend_res_info <- reactiveVal(NULL)
+        })            
 
         # 출력함수 정의 -------------------------------------------------------------------------------- #
+        # 1) DB에서 추천 음식점 정보 Loading
+        # 2) 추천 음식점 정보 reactiveVal로 변환 -> UI는 reactiveVal의 값 변화에 대응하여 업데이트 되므로
+
         recommendRestaurant <- function() {
             # 음식점 정보 랜덤으로 테이블 출력 (연속 중복 X)
-            sql_1 <- "select * from res;"
-            df_res <- dbGetQuery(con, sql_1) |> data.table()
+            sql_1 <- "SELECT * FROM res;"
+            df_res <- dbGetQuery(con, sql_1) |> as.data.table()
             random_num <- sample(df_res$id, 1 , replace = FALSE) |> as.integer() 
             print(random_num)
 
             # 랜덤으로 출력된 Id에 해당하는 restaurant 테이블 출력
-            sql_2 <- glue("select * from res where id='{random_num}';")
-            df_res_row <- dbGetQuery(con, sql_2) |> data.table()
+            sql_2 <- glue("SELECT * FROM res WHERE id = {random_num};")
+            df_res_row <- dbGetQuery(con, sql_2) |> as.data.table()
             rec_name <- df_res_row$res_name # 음식점이름 변수 : res_name
-            print(rec_name)
+            resName(rec_name)
+            # [old way]
+            # output$res_name_rec <- renderUI({
+            #     tags$h1( rec_name )
+            # })
 
-            # 음식점 이름 UI에 출력
-            output$res_name_rec <- renderUI({
-                tags$h1(
-                rec_name
-                )
-            })
+            
 
             # 추천음식점의 카테고리 출력
             rec_category <- df_res_row$category
@@ -76,49 +95,84 @@ food_rec_Server <- function(id){
                 tags$h4("메뉴 : ", rec_menu_str , style = "font-size:15px; margin-left: 10px;")
             })
 
+            # 추천음식점의 평점 출력
+            print(is.na(df_res_row$rating_naver))
+            rec_rating <- ifelse(is.na(df_res_row$rating_naver) ,"평점 없음" , df_res_row$rating_naver )
+            
+
+            # 추천음식점의 가격(평균) 출력
+            rec_price <- priceToList(df_res_row)
+            
+
+
+            # 추천음식점의 거리 출력
+            rec_distance <- df_res_row$distance
+
+            #naver_url
+            rec_url <- df_res_row$url_naver 
+
             #음식점 이름 , 카테고리 , 메뉴 반환
-            return(list(res_id = random_num, res_name = rec_name , res_cate = rec_category , res_menu = rec_menu_str))
+            return(
+                list(
+                    res_id = random_num, 
+                    res_name = rec_name , 
+                    res_cate = rec_category , 
+                    res_menu = rec_menu_str,
+                    res_rating = rec_rating,
+                    res_price = rec_price,
+                    res_distance = rec_distance,
+                    res_url = rec_url
+                )
+            )
         }
 
         # 초기화면에서 추천음식점 출력 ------------------------------------------------------------------------ #
-        recommendRestaurant()
-        recommend_res_info <-recommendRestaurant()
+        # [new way]
+        output$res_name <- renderUI({
+            tags$h1( resName() )
+        })
+        
+        # 추천 레스토랑 정보 from DB
+        res_info <- recommendRestaurant()
+        recommend_res_info( res_info )
+
         created <- lubridate::now() |> format(x =_, "%Y-%m-%d %H:%M:%S.%S3")
-            user_id <- session$userData[["user_id"]]
-            res_id <-  recommend_res_info$res_id
+        user_id <- session$userData[["user_id"]]
+        res_id <-  res_info$res_id
 
-            # step2: script 생성
-            sql_script <- glue("
-                INSERT INTO testdb.recommend (user_id, res_id, created) VALUES(
-	                {user_id}, {res_id}, '{created}'
-                );
-            ")
+        # step2: script 생성
+        sql_script <- glue("
+            INSERT INTO testdb.recommend (user_id, res_id, created) VALUES(
+                {user_id}, {res_id}, '{created}'
+            );
+        ")
+
+        # step3: send query to MySQL
+        # recommend 테이블에 추천 음식점 기록
+        dbExecute(con, sql_script)
 
 
-            # step3: send query to MySQL
-            # recommend테이블에 아무것도 없을때
-            ##dbtable 가져오기
-            dbTable <- session$userData[["dbTable"]]
-
-            ##db table 중 res table에서 음식점 이름 가져오기
-            dbExecute(con, sql_script)
-           
+        #dbtable 가져오기
+        dbTable <- session$userData[["dbTable"]]
             
 
+        
         # 새로고침 버튼 클릭 시, 출력 ----------------------------------------------------------------------- 
         observeEvent(input$refreshButton,{
             req(input$refreshButton)
-
-            # 추천음식점 출력
-            recommendRestaurant()
-
-
-            ## 추천음식점 기록
+            
+            # 추천음식점 기록
             # 추천음식점 출력 함수 반환값 변수지정
-            recommend_res_info <-recommendRestaurant()
+            # 랜덤 추천음식점 출력
+            recommend_res_info(recommendRestaurant())
+            
+
+            
+            # recommendRestaurant()
+            # recommend_res_info(recommendRestaurant())
 
             # 반환값 global approach
-            session$userData[["his_value"]] <- recommend_res_info
+            session$userData[["his_value"]] <- recommend_res_info()
             
             # #새로고침 버튼 global approach
             rnt <- sample(c(-1L, 1L), 1L)
@@ -128,12 +182,12 @@ food_rec_Server <- function(id){
             # step1: column value 생성
             created <- lubridate::now() |> format(x =_, "%Y-%m-%d %H:%M:%S.%S3")
             user_id <- session$userData[["user_id"]]
-            res_id <-  recommend_res_info$res_id
+            res_id <-  recommend_res_info()[["res_id"]]
 
             # step2: script 생성
             sql_script <- glue("
                 INSERT INTO testdb.recommend (user_id, res_id, created) VALUES(
-	                {user_id}, {res_id}, '{created}'
+                    {user_id}, {res_id}, '{created}'
                 );
             ")
 
@@ -146,5 +200,50 @@ food_rec_Server <- function(id){
             # recommended way: write a script algorithimcally
 
         })
+
+            
+            
+        # modal내용 출력
+        observeEvent(input$rec_modal,{   
+            showModal(
+                # modal UI
+                modal_ui_file(
+                    id = id,
+                    session = session,
+                    name = recommend_res_info()[["res_name"]],
+                    category = recommend_res_info()[["res_cate"]],
+                    menu = recommend_res_info()[["res_menu"]],
+                    rating_naver = recommend_res_info()[["res_rating"]],
+                    price = recommend_res_info()[["res_price"]],
+                    distance = recommend_res_info()[["res_distance"]],
+                    url = recommend_res_info()[["rec_url"]]
+                )
+            )
+        })
+
+
+        # modal에서 리뷰쓰기로 이동하기
+        observeEvent(input$go_review_rec ,{
+            removeModal()
+            updateTabsetPanel(
+                session = parent,
+                inputId = "navbarPage",
+                selected = "rating"
+            )
+        })
+
+        # 그냥 리뷰쓰기로 이동하기
+        go_review_server(input , output , parent)
+        
+        
+        
+        
+
+
+        
+
+
+
+        
     })
 }
