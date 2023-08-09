@@ -156,13 +156,53 @@ getDBTable<-function(){
 
 
 # 자세히보기 modal ------------------------------------------------------------------------------------ #
-#리뷰개수 컬ㄹ럼 생성하는  함수
-df_review <- getDBTable()$review
+
 
 # modal
+## res_id를 인자로 받아서 다른 컬럼들 쫙 뿌리는 형태로 modal형성
+### res table : res_id , category , menu , 평점 , 가격 , 위치
+### review table : res_id , user_id , review
+### image : res_id , 
+### user : res_id , user_name
 
-modal_ui_file <- function(id , session ,  name, category, menu, rating_naver, price, distance, url){
-    ns <- NS(id)
+# name, category, menu, rating_naver, price, distance, url
+
+modal_ui_file <- function(session , res_id){
+    ns <- session$ns
+    
+    #table 모음
+    df_res <- getDBTable()$res
+    df_review <- getDBTable()$review
+    df_image <- getDBTable()$image
+    df_user <- getDBTable()$user
+
+    #datatable
+    res_info <- df_res %>% filter(id == res_id)
+    #음식점 이름
+    name = res_info$res_name
+    #카테고리
+    category = res_info$category
+    #메뉴
+    menu_list <- fromJSON(res_info$menu)
+    menu <- names(menu_list) |> paste(collapse = ",")
+    # 평점
+    rating_naver <- ifelse(is.na(res_info$rating_naver) ,"평점 없음" , res_info$rating_naver )
+    # 가격
+    price <- priceToList(res_info)
+    # 거리
+    distance <- res_info$distance
+    # 네이버 url
+    url <- res_info$url_naver 
+   
+   #TI평점 출력
+    df_TI_score <- df_review %>% 
+                    filter(res_id == res_id) %>% 
+                        select(rating_TI)
+
+    mean_score <- round(mean(as.numeric(pull(df_TI_score)) ),3)
+    
+
+    
     modalDialog(
         title = " Information",
         tags$style(".modal-title { font-size: 30px; }"),
@@ -191,7 +231,6 @@ modal_ui_file <- function(id , session ,  name, category, menu, rating_naver, pr
                     tags$div(style = "display: flex;",
                         tags$span(
                             tags$h4("네이버 평점 : ",rating_naver)
-                            
                         ),
                         tags$span(style = "margin-left:3px; margin-top:11px;",
                             tags$a(
@@ -206,13 +245,13 @@ modal_ui_file <- function(id , session ,  name, category, menu, rating_naver, pr
             fluidRow(
                 column(
                     width = 12,
-                    tags$h4("가격(평균) : ",price)
+                    tags$h4("가격(평균) : ",price , "원")
                 )
             ),      
             fluidRow(
                 column(
                     width = 12,
-                    tags$h4("위치(회사기준) : ",price)
+                    tags$h4("위치(회사기준) : ",distance , "m")
                 )
             ),            
             fluidPage(sylte = "background-color : #FAFBFC;",
@@ -222,20 +261,18 @@ modal_ui_file <- function(id , session ,  name, category, menu, rating_naver, pr
                 fluidRow(
                     column(
                         width = 10,
-                        tags$h4("평점(TI) : ")
+                        tags$h4("평점(TI) : " , mean_score)
                     ),
                     column(
                         width = 2,
                         tags$h4(
                             actionLink(
-                                inputId = ns("go_review_rec"),
+                                inputId = ns("go_review_modal"),
                                 label = "리뷰쓰기"
                             )
                         )
-
                     )
                 ),
-                
                 fluidRow(
                     column(
                         width = 12,
@@ -269,6 +306,18 @@ modal_ui_file <- function(id , session ,  name, category, menu, rating_naver, pr
 }
 
 
+# modal에서 리뷰쓰기로 이동하기
+go_review_modal_server <- function(input , session ){
+    observeEvent(input$go_review_modal ,{
+        removeModal()
+        updateTabsetPanel(
+            session = session,
+            inputId = "navbarPage",
+            selected = "rating"
+        )
+    })
+}
+
 # 리뷰쓰기 페이지 이동 함수 --------------------------------------------------------------------------------- 수
 go_review_ui <- function(id ){
     ns <- NS(id)
@@ -278,13 +327,12 @@ go_review_ui <- function(id ){
     )
 }
 
-go_review_server <- function(input , output ,session ){
-observeEvent(input$go_review ,{
-            updateTabsetPanel(
-                session = session,
-                inputId = "navbarPage",
-                selected = "rating"
-            )
-        })
-
+go_review_server <- function(input , session ){
+    observeEvent(input$go_review ,{
+        updateTabsetPanel(
+            session = session,
+            inputId = "navbarPage",
+            selected = "rating"
+        )
+    })
 }

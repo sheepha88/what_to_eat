@@ -208,42 +208,17 @@ food_rec_Server <- function(id, parent){
             showModal(
                 # modal UI
                 modal_ui_file(
-                    id = id,
                     session = session,
-                    name = recommend_res_info()[["res_name"]],
-                    category = recommend_res_info()[["res_cate"]],
-                    menu = recommend_res_info()[["res_menu"]],
-                    rating_naver = recommend_res_info()[["res_rating"]],
-                    price = recommend_res_info()[["res_price"]],
-                    distance = recommend_res_info()[["res_distance"]],
-                    url = recommend_res_info()[["rec_url"]]
+                    res_id = recommend_res_info()[["res_id"]]
                 )
             )
         })
 
-
         # modal에서 리뷰쓰기로 이동하기
-        observeEvent(input$go_review_rec ,{
-            removeModal()
-            updateTabsetPanel(
-                session = parent,
-                inputId = "navbarPage",
-                selected = "rating"
-            )
-        })
-
+        go_review_modal_server(input , parent)
+        
         # 그냥 리뷰쓰기로 이동하기
-        go_review_server(input , output , parent)
-        
-        
-        
-        
-
-
-        
-
-
-
+        go_review_server(input , parent)
         
     })
 }

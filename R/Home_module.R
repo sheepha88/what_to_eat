@@ -8,7 +8,7 @@ home_UI <- function(id){
     fluidPage(style = "display: flex; justify-content: center; align-items: center; background : #FAFBFC;",
         id = id,
         fluidRow(style = "width: 500px; background : white; border:2px solid #E8EBEE; border-radius: 10px; ",
-            tags$h3("Home" , style = "font-weight: bold;"),
+            tags$h3(HTML("&nbsp;Home") , style = "font-weight: bold;"),
             tags$div(class = "part_line",
                 tags$h4(
                     "오늘의 추천음식점",

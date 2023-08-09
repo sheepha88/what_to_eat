@@ -30,9 +30,9 @@ week_his_Server <- function(id){
         
         ## review table 중 주의 날짜들이 포함되는 날짜 , 참여자 , 음식점_id를 출력
         sql_review_table <- glue(
-            "select res_name, menu , date_visit , participants 
-            from review inner join res on review.res_id = res.id
-            where date_visit in ({week_dates}) order by date_visit ;"
+            "SELECT res_name, menu , date_visit , participants 
+            FROM review INNER JOIN res ON review.res_id = res.id
+            WHERE date_visit IN ({week_dates}) ORDER BY date_visit ;"
         )
         
         df_reivew <- dbGetQuery(con , sql_review_table) |> data.table()
