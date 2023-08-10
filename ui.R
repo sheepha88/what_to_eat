@@ -2,6 +2,8 @@ ui <- fluidPage(
   useShinyjs(),
   includeScript("www/custom.js"),
 
+  theme = bs_theme(version = 5),
+
   
   #HTML function 지정
     tags$head(tags$script(type = "text/javascript", 
@@ -75,7 +77,7 @@ ui <- fluidPage(
                 navbarPage(
                     id = "navbarPage",
                     title = "What to eat",
-
+                    
                     #Home page
                     tabPanel("Home",
                         home_UI("Home")
@@ -85,7 +87,8 @@ ui <- fluidPage(
                     ),
                     tabPanel(
                         title = "평점 & 리뷰작성",
-                        value = "rating"
+                        value = "rating",
+                        review_UI("Review")
                     )
                 ),
                 class = "navbar_class",

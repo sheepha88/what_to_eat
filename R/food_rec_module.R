@@ -5,6 +5,7 @@ food_rec_UI <- function(id){
     fluidPage(
         id = id,
         fluidRow(
+            
             tags$span(style = "text-align: center;",
                 uiOutput(ns("res_name"))
             ),
@@ -204,12 +205,12 @@ food_rec_Server <- function(id, parent){
             
             
         # modal내용 출력
-        observeEvent(input$rec_modal,{   
+        observeEvent(input$rec_modal, {   
             showModal(
                 # modal UI
                 modal_ui_file(
                     session = session,
-                    res_id = recommend_res_info()[["res_id"]]
+                    rec_res_id = recommend_res_info()[["res_id"]]
                 )
             )
         })
@@ -219,6 +220,9 @@ food_rec_Server <- function(id, parent){
         
         # 그냥 리뷰쓰기로 이동하기
         go_review_server(input , parent)
+
+        #자세히 보기 눌렀을때 fakebutton누르기
+
         
     })
 }

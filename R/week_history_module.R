@@ -47,31 +47,38 @@ week_his_Server <- function(id){
             if(nrow(df_reivew)!=0L){
                 count_seq <- rev(seq(nrow(df_reivew)))
                 tags <- lapply(count_seq, function(i) {
-                    tags$div(class = "dynamic-div",
-                            style = "border: 1px solid black; border-radius: 10px; 
-                            background-color: #4574C4; padding: 10px; 
-                            margin-top: 15px; margin-bottom: 15px; margin-left: 10px; margin-right: 10px;",
-                        tags$span(
-                            style = "color: white;",
-                            paste(
-                                "•    ",  df_reivew[i,"date_visit"] ," : ", df_reivew[i,"res_name"] ,
-                                "/" , df_reivew[i,"menu"] 
-                            ),
-                            tags$br(),
-                            "참석자 : " , df_reivew[i,"participants"]
+                    fluidRow(
+                        class = "dynamic-div",
+                        style = "border: 1px solid black; border-radius: 10px; 
+                        background-color: #4574C4; padding: 10px; 
+                        margin-top: 15px; margin-bottom: 15px; margin-right: 10px;",
+                        column(
+                            width = 12,
+                            tags$div(
+                                style = "color: white;",
+                                paste(
+                                    "•    ",  df_reivew[i,"date_visit"] ," : ", df_reivew[i,"res_name"] ,
+                                    "/" , df_reivew[i,"menu"] 
+                                ),
+                                tags$br(),
+                                "참석자 : " , df_reivew[i,"participants"]
+                            )
                         )
                     )
+                    
                 })
             }else{
                 # 오늘날짜애 대한 그 주의 기록이 없다면 "기록없음" 출력
-                tags$div(class = "dynamic-div",
-                            style = "border: 1px solid black; border-radius: 10px; 
-                            background-color: #4574C4; padding: 10px; 
-                            margin-top: 15px; margin-bottom: 15px; margin-left: 10px; margin-right: 10px;",
-                        tags$span(
+                fluidRow(
+                        class = "dynamic-div",
+                        style = "border: 1px solid black; border-radius: 10px; 
+                        background-color: #4574C4; padding: 10px; 
+                        margin-top: 15px; margin-bottom: 15px; margin-right: 10px;",
+                        column(
+                            width = 12,
                             style = "color: white;",
                             paste(
-                                "•    ","식사가록이 없습니다."
+                                "•    ","식사기록이 없습니다."
                             ),
                         )
                 )

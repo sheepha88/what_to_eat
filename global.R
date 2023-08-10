@@ -167,17 +167,18 @@ getDBTable<-function(){
 
 # name, category, menu, rating_naver, price, distance, url
 
-modal_ui_file <- function(session , res_id){
+modal_ui_file <- function(session , rec_res_id){
     ns <- session$ns
     
     #table 모음
-    df_res <- getDBTable()$res
-    df_review <- getDBTable()$review
-    df_image <- getDBTable()$image
-    df_user <- getDBTable()$user
+    df<-getDBTable()
+    df_res <- df$res
+    df_review <- df$review
+    df_image <- df$image
+    df_user <- df$user
 
     #datatable
-    res_info <- df_res %>% filter(id == res_id)
+    res_info <- df_res %>% filter(id == rec_res_id)
     #음식점 이름
     name = res_info$res_name
     #카테고리
@@ -194,12 +195,53 @@ modal_ui_file <- function(session , res_id){
     # 네이버 url
     url <- res_info$url_naver 
    
-   #TI평점 출력
-    df_TI_score <- df_review %>% 
-                    filter(res_id == res_id) %>% 
-                        select(rating_TI)
+   #TI평점 , 리뷰 , 사용자 출력
+   #사용자 ID userid로 출력
+    df_join <- inner_join(df_review , df_user , by = c("user_id" = "id"))
+    
+   
+    df_TI_review <- df_join %>% 
+                    filter(res_id == rec_res_id) %>% 
+                        select(rating_TI , comment , username)
+    
+    #TI 평정
+    mean_score <- round(mean(as.numeric(df_TI_review$rating_TI) ),1)
 
-    mean_score <- round(mean(as.numeric(pull(df_TI_score)) ),3)
+    #사용자 , 리뷰
+    # output$review_bar <- renderUI({
+    #     tags <- lapply(seq(nrow(df_TI_review)) , function(x){
+    #                 tags$div(class = "part_line",
+    #                     tags$div(style = " font-weight: bold;",
+    #                         df_TI_review[x , "username"]
+    #                     ),
+    #                     tags$div(
+    #                         "이미지.jpg"
+    #                     ),
+    #                     tags$div(
+    #                         df_TI_review[x, "comment"]
+    #                     )
+    #                 )
+    #             })
+    #         })
+
+    reviewTags <- lapply(seq(nrow(df_TI_review)) , function(x){
+        tags$div(class = "part_line",
+            tags$div(style = " font-weight: bold;",
+                df_TI_review[x , "username"]
+            ),
+            tags$div(
+                "이미지.jpg"
+            ),
+            tags$div(
+                df_TI_review[x, "comment"]
+            )
+        )
+    })
+
+    
+
+
+    #리뷰 출력
     
 
     
@@ -254,7 +296,9 @@ modal_ui_file <- function(session , res_id){
                     tags$h4("위치(회사기준) : ",distance , "m")
                 )
             ),            
-            fluidPage(sylte = "background-color : #FAFBFC;",
+            fluidPage(
+                style = "background-color : #FAFBFC;",
+                class = "border",
                 tags$h3(class = "part_line",
                     "TI history"
                 ),
@@ -279,28 +323,21 @@ modal_ui_file <- function(session , res_id){
                         tags$h4("리뷰")
                     )
                 ),
-                fluidPage(sylte = "background-color : #FAFBFC;",
+                fluidPage(style = "background-color : #FAFBFC;",
                     #리뷰수대로 생성해야함
                     #함수사용
                     column(
                         width = 12,
-                        tags$div(class = "part_line",
-                            "dfs"
-                        )
+                        #uiOutput(ns("review_bar")),
+                        reviewTags
                     )
                 )
             )
-
         ),
         size = "l",
         easyClose = TRUE,
         footer = tagList(
-            actionButton(
-                inputId = "yes_file",
-                label = "Yes",
-                class = "btn-primary",
-            ),
-        modalButton("Close")
+            modalButton("Close")
         )
     )
 }
@@ -319,6 +356,7 @@ go_review_modal_server <- function(input , session ){
 }
 
 # 리뷰쓰기 페이지 이동 함수 --------------------------------------------------------------------------------- 수
+# boserveEvent안에
 go_review_ui <- function(id ){
     ns <- NS(id)
     actionLink(
@@ -327,6 +365,7 @@ go_review_ui <- function(id ){
     )
 }
 
+#observeEvent 바깥에
 go_review_server <- function(input , session ){
     observeEvent(input$go_review ,{
         updateTabsetPanel(

@@ -19,11 +19,14 @@ server <- function(input, output, session) {
         #HOME tab_server
         food_rec_Server("food_rec", parent = session)
         week_his_Server("week_his")
-        res_his_Server("res_his")
+        res_his_Server("res_his", parent = session)
 
 
         #음식점 검색 tab_server
         search_Server("Search")
+
+        #reivew , 평점 tab_server
+        review_Server("Review")
 
 
        
