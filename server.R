@@ -5,6 +5,7 @@ server <- function(input, output, session) {
                 session$userData[["refreshClicked"]] <- reactiveVal(0L)
                 session$userData[["user_id"]] <- 1L # needs to be updated
                 session$userData[["dbTable"]] <- getDBTable() #Table 전부 다 가져오는 함수
+                session$userData[["review_res_id"]] <- reactiveVal() #리뷰쓰려고하는 음식점
                 
         })
 
@@ -26,7 +27,7 @@ server <- function(input, output, session) {
         search_Server("Search")
 
         #reivew , 평점 tab_server
-        review_Server("Review")
+        review_Server("Review"  , parent = session)
 
 
        

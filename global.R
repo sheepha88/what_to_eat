@@ -14,6 +14,7 @@ library(lubridate)
 library(dplyr)
 library(DT)
 library(shinyBS)
+library(shinyRatings)
 
 # ------------------------------------------------------------------------------------------------ #
 # mysql connect                                                                                    #
@@ -58,47 +59,26 @@ onStop(function() {
 
 # Row 추가 함수 -------------------------------------------------------------------------------------- #
 addNewFile <- function(wrap_id, i){
-  
-  newFileUI <- fluidRow(
-    id = paste0("addFile_",i),
+    newFileUI <- fluidRow(
+                id = paste0("addFile_",i),
 
-    column(
-      width = 1,
-      tags$h4(i)
-    ),
-
-    column(
-      width = 4,
-      textInput(
-        inputId = paste0("des_", i),
-        label = "Description",
-        value = ""
-      )
-    ),
-
-    column(
-      width = 4,
-      fileInput(
-        inputId = paste0("file_", i),
-        label = "Upload File",
-      ) |> shinyjs::disabled()
-    ),
-
-    column(
-      width = 3,
-      class = "align-self-center",
-      downloadButton(
-        outputId = paste0("down_",i),
-        label = "Download File"
-      ) |> shinyjs::disabled()
-    )
-  )
-    
-      insertUI(
+                column(
+                    width = 1,
+                    tags$h6(i)
+                ),
+                column(
+                    width = 10,
+                    fileInput(
+                        inputId = paste0("file_", i),
+                        label = "Upload File"
+                    ) 
+                )
+            )
+    insertUI(
         selector = paste0("#", wrap_id),
         where = "beforeEnd",
         ui = newFileUI
-      )
+    )
 }
 
 # DB res table 의 메뉴  , 가격 벡터화 ------------------------------------------------------------------------- #
@@ -357,21 +337,46 @@ go_review_modal_server <- function(input , session ){
 
 # 리뷰쓰기 페이지 이동 함수 --------------------------------------------------------------------------------- 수
 # boserveEvent안에
-go_review_ui <- function(id ){
-    ns <- NS(id)
-    actionLink(
-        inputId = ns("go_review"),
-        label = "리뷰쓰기"
-    )
-}
+# go_review_ui <- function(id ){
+#     ns <- NS(id)
+#     actionLink(
+#         inputId = ns("go_review"),
+#         label = "리뷰쓰기"
+#     )
+# }
 
 #observeEvent 바깥에
-go_review_server <- function(input , session ){
-    observeEvent(input$go_review ,{
-        updateTabsetPanel(
-            session = session,
-            inputId = "navbarPage",
-            selected = "rating"
-        )
-    })
+go_review_server <- function( session  , review_res_id ){
+    updateTabsetPanel(
+        session = session,
+        inputId = "navbarPage",
+        selected = "rating"
+    )
+    session$userData[["review_res_id"]](review_res_id)
+}
+
+
+
+# 업로드 modal
+upload_modal<-function(id){
+    ns <- NS(id)
+    modalDialog(
+    title = "평점 & 리뷰작성",
+  
+    fluidRow(
+      tags$p(
+        "업로드를 진행하시겠습니까?"
+      )
+    ),
+    size = "m",
+    easyClose = TRUE,
+    footer = tagList(
+      actionButton(
+        inputId = ns("yes"),
+        label = "확인",
+        class = "btn-primary",
+      ),
+      modalButton("취소")
+    )
+  )
 }

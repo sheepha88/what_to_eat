@@ -33,7 +33,10 @@ food_rec_UI <- function(id){
             ),
             tags$span(
                 tags$h4( style = "font-size:15px; margin-left: 10px;" ,
-                    go_review_ui(id)
+                    actionLink(
+                        inputId = ns("go_review"),
+                        label = "리뷰쓰기"
+                    )
                 )   
             )
            
@@ -199,7 +202,8 @@ food_rec_Server <- function(id, parent){
             ## later: add try-catch
 
             # recommended way: write a script algorithimcally
-
+            print("확인")
+            print(res_id)
         })
 
             
@@ -219,7 +223,10 @@ food_rec_Server <- function(id, parent){
         go_review_modal_server(input , parent)
         
         # 그냥 리뷰쓰기로 이동하기
-        go_review_server(input , parent)
+            observeEvent(input$go_review ,{
+                go_review_server(session = parent ,review_res_id = recommend_res_info()[["res_id"]] )
+        })
+       
 
         #자세히 보기 눌렀을때 fakebutton누르기
 

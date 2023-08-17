@@ -132,17 +132,17 @@ res_his_Server <- function(id , parent){
 
 
 
-        # observeEvent(input$rec_modal,{   
-        #     showModal(
-        #         # modal UI
-        #         modal_ui_file(
-        #             output = output,
-        #             session = session,
-        #             rec_res_id = recommend_res_info()[["res_id"]]
-        #         )
-        #     )
-        # })
+        observeEvent(input$rec_modal,{   
+            showModal(
+                # modal UI
+                modal_ui_file(
+                    output = output,
+                    session = session,
+                    rec_res_id = recommend_res_info()[["res_id"]]
+                )
+            )
+        })
 
-        go_review_server(input , parent)
+        # go_review_server(input , parent)
     })
 }
