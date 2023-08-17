@@ -70,7 +70,7 @@ food_rec_Server <- function(id, parent){
             sql_1 <- "SELECT * FROM res;"
             df_res <- dbGetQuery(con, sql_1) |> as.data.table()
             random_num <- sample(df_res$id, 1 , replace = FALSE) |> as.integer() 
-            print(random_num)
+           
 
             # 랜덤으로 출력된 Id에 해당하는 restaurant 테이블 출력
             sql_2 <- glue("SELECT * FROM res WHERE id = {random_num};")
@@ -94,13 +94,13 @@ food_rec_Server <- function(id, parent){
             rec_menu <- df_res_row$menu
             menu_list <- fromJSON(rec_menu)
             rec_menu_str <- names(menu_list) |> paste(collapse = ",")
-            print(rec_menu_str)
+           
             output$rec_menu <- renderUI({
                 tags$h4("메뉴 : ", rec_menu_str , style = "font-size:15px; margin-left: 10px;")
             })
 
             # 추천음식점의 평점 출력
-            print(is.na(df_res_row$rating_naver))
+        
             rec_rating <- ifelse(is.na(df_res_row$rating_naver) ,"평점 없음" , df_res_row$rating_naver )
             
 
@@ -202,8 +202,7 @@ food_rec_Server <- function(id, parent){
             ## later: add try-catch
 
             # recommended way: write a script algorithimcally
-            print("확인")
-            print(res_id)
+        
         })
 
             
@@ -218,18 +217,10 @@ food_rec_Server <- function(id, parent){
                 )
             )
         })
-
-        # modal에서 리뷰쓰기로 이동하기
-        go_review_modal_server(input , parent)
         
         # 그냥 리뷰쓰기로 이동하기
             observeEvent(input$go_review ,{
                 go_review_server(session = parent ,review_res_id = recommend_res_info()[["res_id"]] )
         })
-       
-
-        #자세히 보기 눌렀을때 fakebutton누르기
-
-        
     })
 }

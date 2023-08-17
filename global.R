@@ -70,7 +70,7 @@ addNewFile <- function(wrap_id, i){
                     width = 10,
                     fileInput(
                         inputId = paste0("file_", i),
-                        label = "Upload File"
+                        label = "Upload Image"
                     ) 
                 )
             )
@@ -86,7 +86,12 @@ addNewFile <- function(wrap_id, i){
 menuToList <- function(table){
     menu_list <- lapply(table$menu , fromJSON) #menu json형태 list화
     rec_menu_str <- lapply(menu_list , names)  #메뉴만 추출
+
+    #각 메뉴 문자열 합치기 -> 원래 데이터프레임의 개수와 같게 하기 위함
+    rec_menu_str <- sapply(rec_menu_str, function(x) paste(x, collapse = ", "))
+    
     return(rec_menu_str)
+    
 }
 
 
@@ -187,23 +192,6 @@ modal_ui_file <- function(session , rec_res_id){
     #TI 평정
     mean_score <- round(mean(as.numeric(df_TI_review$rating_TI) ),1)
 
-    #사용자 , 리뷰
-    # output$review_bar <- renderUI({
-    #     tags <- lapply(seq(nrow(df_TI_review)) , function(x){
-    #                 tags$div(class = "part_line",
-    #                     tags$div(style = " font-weight: bold;",
-    #                         df_TI_review[x , "username"]
-    #                     ),
-    #                     tags$div(
-    #                         "이미지.jpg"
-    #                     ),
-    #                     tags$div(
-    #                         df_TI_review[x, "comment"]
-    #                     )
-    #                 )
-    #             })
-    #         })
-
     reviewTags <- lapply(seq(nrow(df_TI_review)) , function(x){
         tags$div(class = "part_line",
             tags$div(style = " font-weight: bold;",
@@ -218,13 +206,7 @@ modal_ui_file <- function(session , rec_res_id){
         )
     })
 
-    
-
-
     #리뷰 출력
-    
-
-    
     modalDialog(
         title = " Information",
         tags$style(".modal-title { font-size: 30px; }"),
@@ -286,15 +268,6 @@ modal_ui_file <- function(session , rec_res_id){
                     column(
                         width = 10,
                         tags$h4("평점(TI) : " , mean_score)
-                    ),
-                    column(
-                        width = 2,
-                        tags$h4(
-                            actionLink(
-                                inputId = ns("go_review_modal"),
-                                label = "리뷰쓰기"
-                            )
-                        )
                     )
                 ),
                 fluidRow(
@@ -323,29 +296,8 @@ modal_ui_file <- function(session , rec_res_id){
 }
 
 
-# modal에서 리뷰쓰기로 이동하기
-go_review_modal_server <- function(input , session ){
-    observeEvent(input$go_review_modal ,{
-        removeModal()
-        updateTabsetPanel(
-            session = session,
-            inputId = "navbarPage",
-            selected = "rating"
-        )
-    })
-}
 
-# 리뷰쓰기 페이지 이동 함수 --------------------------------------------------------------------------------- 수
-# boserveEvent안에
-# go_review_ui <- function(id ){
-#     ns <- NS(id)
-#     actionLink(
-#         inputId = ns("go_review"),
-#         label = "리뷰쓰기"
-#     )
-# }
-
-#observeEvent 바깥에
+#  리뷰쓰기로 이동하기
 go_review_server <- function( session  , review_res_id ){
     updateTabsetPanel(
         session = session,

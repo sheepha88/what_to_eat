@@ -85,7 +85,11 @@ res_his_Server <- function(id , parent){
                             column(
                                 width = 2,
                                 tags$div(
-                                    actionLink(inputId = ns(paste0("go_review_",i)) , label = "리뷰쓰기")
+                                    actionLink(
+                                        inputId = ns(paste0("go_review_",i)) ,
+                                        label = "리뷰쓰기",
+                                        onclick = glue("viewReview({res_id})")
+                                    )
                                 )
                             )
                         )
@@ -96,7 +100,7 @@ res_his_Server <- function(id , parent){
                         # recommendation history
                         recList,
 
-                        # javascript function to pass resId
+                        # javascript function to pass resId_자세히보기
                         singleton(tags$script(HTML(glue(
                             'function viewDetail(resId){
                                 Shiny.setInputValue(\"{{ns("modalResId")}}\", resId);
@@ -104,9 +108,24 @@ res_his_Server <- function(id , parent){
                             }', .open = "{{", .close="}}"
                         )))),
 
+                        # javascript function to pass resId_리뷰쓰기
+                        singleton(tags$script(HTML(glue(
+                            'function viewReview(resId){
+                                Shiny.setInputValue(\"{{ns("ReviewResId")}}\", resId);
+                                document.getElementById(\"{{ns("dummyButtonReview")}}\").click();
+                            }', .open = "{{", .close="}}"
+                        )))),
+
                         # dummy button
+                        ##자세히보기 버튼
                         actionButton(
                             inputId = ns("dummyButtonViewDetail"),
+                            label = "DUMMY button",
+                            class = "sr-only"
+                        ),
+                        ##리뷰쓰기 버튼
+                        actionButton(
+                            inputId = ns("dummyButtonReview"),
                             label = "DUMMY button",
                             class = "sr-only"
                         ),
@@ -118,8 +137,11 @@ res_his_Server <- function(id , parent){
 
         })
 
+
+        
+
+        #자세히보기를 누르면 숨겨진 통합버튼을 클릭
         observeEvent(input$dummyButtonViewDetail, {
-            # print(input$modalResId)
             showModal(
                 # modal UI
                 modal_ui_file(
@@ -131,18 +153,9 @@ res_his_Server <- function(id , parent){
         })
 
 
-
-        observeEvent(input$rec_modal,{   
-            showModal(
-                # modal UI
-                modal_ui_file(
-                    output = output,
-                    session = session,
-                    rec_res_id = recommend_res_info()[["res_id"]]
-                )
-            )
+        #리뷰쓰기
+        observeEvent(input$dummyButtonReview,{   
+            go_review_server(session = parent ,review_res_id = as.integer(input$ReviewResId) )
         })
-
-        # go_review_server(input , parent)
     })
 }

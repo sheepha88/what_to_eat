@@ -214,10 +214,6 @@ review_Server <- function(id , parent ){
             rating_TI <- as.numeric(input$star)
             comment <- input$review_area
 
-            print("DB")
-            print(rating_TI)
-            print(comment)
-
             # DB넣기
             sql_script <- glue("
                 INSERT INTO testdb.review (

@@ -26,7 +26,7 @@ week_his_Server <- function(id){
         ### 주의 날짜들
         week_dates <- seq(first_day_of_week, last_day_of_week, by = "day") 
         week_dates <- paste("'", week_dates, "'", collapse = ", ")
-        print(week_dates)
+       
         
         ## review table 중 주의 날짜들이 포함되는 날짜 , 참여자 , 음식점_id를 출력
         sql_review_table <- glue(
@@ -37,6 +37,7 @@ week_his_Server <- function(id){
         
         df_reivew <- dbGetQuery(con , sql_review_table) |> data.table()
         df_reivew$menu <- unlist(menuToList(table = df_reivew))
+       
 
         
 
