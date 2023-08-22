@@ -58,15 +58,6 @@ Admin_UI <- function(id ){
                                 )
                             )
                         )
-                    ),
-                    fluidRow(style = "justify-content: center;",
-                        actionButton(
-                            inputId = ns("upload") , 
-                            label = "Upload",
-                            style = "margin-bottom : 20px; ",
-                            width = "100px",
-                            class="btn btn-success"
-                        )
                     )
                 )
             )
@@ -90,27 +81,28 @@ Admin_Server <- function(id ){
         df_res$menu <- menuToList(df_res) 
 
         # columns = c(res_name ,category , menu , price ,  rating_naver , distance)
-        df_res <- df_res[,.(id ,res_name ,category , menu , price ,  rating_naver , distance)]
+        df_res <- df_res[,.(id ,res_name ,category , menu , price ,  rating_naver, url_naver , distance)]
         
         df_res[["Select"]]<-glue::glue(
                     '<input type="checkbox" name="', ns("selected"), '"  value="{1:nrow(df_res)}"><br>'
                 )
-        df_res <- df_res[,c(8,1,2,3,4,5,6,7)]
-        colums_names = c("선택","ID","음식점 이름" , "카테고리" , "메뉴"  ,"가격","평점" ,"위치(m)"    )
+        df_res <- df_res[,c(9,1,2,3,4,5,6,7,8)]
+        colums_names = c("선택","ID","음식점 이름" , "카테고리" , "메뉴"  ,"가격","평점" ,"네이버URL","위치(m)"    )
         output$data_table <- DT::renderDataTable(
                 
                 DT::datatable(df_res, escape=FALSE,  colnames = colums_names,
                   options = list(
                     pageLength = 20, Width = '1500px',
                     columnDefs = list(
-                                    list( targets = 1, width = '100px'),
-                                    list( targets = 2, width = '100px'),
+                                    list( targets = 1, width = '50px'),
+                                    list( targets = 2, width = '50px'),
                                     list( targets = 3, width = '200px'),
                                     list( targets = 4, width = '200px'),
                                     list( targets = 5, width = '200px'),
                                     list( targets = 6, width = '200px'),
                                     list( targets = 7, width = '200px'),
-                                    list( targets = 8, width = '200px')
+                                    list( targets = 8, width = '200px'),
+                                    list( targets = 9, width = '200px')
                                 ),
                     transpose = TRUE,
                     scrollX = TRUE,
@@ -193,21 +185,44 @@ Admin_Server <- function(id ){
         observeEvent(input$checked_rows,{
             rows <- as.numeric(input$checked_rows)
             rows_num(as.vector(unlist(df_res[ rows, "id"])))
-            
         })
 
 
         observeEvent(input$data_delete,{
             print(rows_num())
             static_rows_num <- paste0(rows_num() , collapse = ",")
-            
             sql_script <- glue("
                 UPDATE what_to_eatDB.res SET deleted = 0 WHERE id IN ({static_rows_num})
             ")
-            
             # send query to MySQL
             dbExecute(con, sql_script)
             print("삭제완료")
+        })
+
+        #음식점 수정
+        observeEvent(input$data_edit,{
+            print(rows_num())
+            showModal(
+                modalDialog(
+                    title = "음식점 수정",
+                
+                    fluidRow(
+                        tags$p(
+                            "업로드를 진행하시겠습니까?"
+                        )
+                    ),
+                    size = "l",
+                    easyClose = TRUE,
+                    footer = tagList(
+                    actionButton(
+                        inputId = ns("edit"),
+                        label = "수정",
+                        class = "btn-primary",
+                    ),
+                    modalButton("취소")
+                    )
+                )
+            )
         })
     }
 )}
