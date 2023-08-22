@@ -130,8 +130,6 @@ res_his_Server <- function(id , parent){
                             class = "sr-only"
                         ),
                     )
-                    
-
                 })
             }
 

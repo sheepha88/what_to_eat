@@ -216,7 +216,7 @@ review_Server <- function(id , parent ){
 
             # DB넣기
             sql_script <- glue("
-                INSERT INTO testdb.review (
+                INSERT INTO what_to_eatDB.review (
                     date_visit , participants , rating_TI , comment ,res_id ,  user_id
                     ) VALUES(
                     '{visit_date}' ,'{participants}' , {rating_TI} , '{comment}' ,  {res_id}, {user_id}

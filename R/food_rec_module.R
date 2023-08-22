@@ -146,7 +146,7 @@ food_rec_Server <- function(id, parent){
 
         # step2: script 생성
         sql_script <- glue("
-            INSERT INTO testdb.recommend (user_id, res_id, created) VALUES(
+            INSERT INTO what_to_eatDB.recommend (user_id, res_id, created) VALUES(
                 {user_id}, {res_id}, '{created}'
             );
         ")
@@ -190,7 +190,7 @@ food_rec_Server <- function(id, parent){
 
             # step2: script 생성
             sql_script <- glue("
-                INSERT INTO testdb.recommend (user_id, res_id, created) VALUES(
+                INSERT INTO what_to_eatDB.recommend (user_id, res_id, created) VALUES(
                     {user_id}, {res_id}, '{created}'
                 );
             ")

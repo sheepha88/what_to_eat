@@ -1,33 +1,37 @@
 server <- function(input, output, session) {
-        #새로고침 버튼 타 모듈에서 이용을 위해 isolate
+	#새로고침 버튼 타 모듈에서 이용을 위해 isolate
 
-        isolate({
-                session$userData[["refreshClicked"]] <- reactiveVal(0L)
-                session$userData[["user_id"]] <- 1L # needs to be updated
-                session$userData[["dbTable"]] <- getDBTable() #Table 전부 다 가져오는 함수
-                session$userData[["review_res_id"]] <- reactiveVal() #리뷰쓰려고하는 음식점
-                
-        })
+	isolate({
+			session$userData[["refreshClicked"]] <- reactiveVal(0L)
+			session$userData[["user_id"]] <- 1L # needs to be updated
+			session$userData[["dbTable"]] <- getDBTable() #Table 전부 다 가져오는 함수
+			session$userData[["review_res_id"]] <- reactiveVal() #리뷰쓰려고하는 음식점
+			
+	})
 
-        # 미래구조
-        # db_table <- dataModule_Server("data_module", trigger) trogger = 로그인했을때
-        # module_1("module1", db_table)
-        # module_2("module2", db_table)
-        
-        
-
-
-        #HOME tab_server
-        food_rec_Server("food_rec", parent = session)
-        week_his_Server("week_his")
-        res_his_Server("res_his", parent = session)
+	# 미래구조
+	# db_table <- dataModule_Server("data_module", trigger) trogger = 로그인했을때
+	# module_1("module1", db_table)
+	# module_2("module2", db_table)
+	
+	
 
 
-        #음식점 검색 tab_server
-        search_Server("Search")
+	#HOME tab_server
+	food_rec_Server("food_rec", parent = session)
+	week_his_Server("week_his")
+	res_his_Server("res_his", parent = session)
 
-        #reivew , 평점 tab_server
-        review_Server("Review"  , parent = session)
+
+	#음식점 검색 tab_server
+	search_Server("Search")
+
+	#reivew , 평점 tab_server
+	review_Server("Review"  , parent = session)
+
+	#Admin
+	Admin_Server("Admin")
+
 
 
        

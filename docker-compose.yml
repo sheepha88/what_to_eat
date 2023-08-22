@@ -8,7 +8,7 @@ services: # 컨테이너 설정
       - ./mysqldata:/var/lib/mysql
     environment: # 컨테이너 안의 환경변수 설정
       - MYSQL_ROOT_PASSWORD=0000
-      - MYSQL_DATABASE=testdb
+      - MYSQL_DATABASE=what_to_eatDB
     ports: # -p 옵션과 동일
       - "3306:3306"
     container_name: mysql-container

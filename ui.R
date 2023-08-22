@@ -4,7 +4,7 @@ ui <- fluidPage(
 
   theme = bs_theme(version = 5),
 
-  
+
   #HTML function 지정
     tags$head(tags$script(type = "text/javascript", 
                         HTML("function getUploadTarget(value , id) {
@@ -89,6 +89,11 @@ ui <- fluidPage(
                         title = "평점 & 리뷰작성",
                         value = "rating",
                         review_UI("Review")
+                    ),
+                    tabPanel(
+                        title = "ADMIN",
+                        value = "Admin",
+                        Admin_UI("Admin")
                     )
                 ),
                 class = "navbar_class",
@@ -105,6 +110,7 @@ ui <- fluidPage(
         
     )
 )
+
 
 
     

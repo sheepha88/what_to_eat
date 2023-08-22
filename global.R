@@ -15,6 +15,8 @@ library(dplyr)
 library(DT)
 library(shinyBS)
 library(shinyRatings)
+library(shinymanager)
+library(toastui)
 
 # ------------------------------------------------------------------------------------------------ #
 # mysql connect                                                                                    #
@@ -28,7 +30,7 @@ con <- dbConnect(
   user="root", 
   password="0000",
   host="127.0.0.1", 
-  dbname = "testdb",
+  dbname = "what_to_eatDB",
   client.flag=CLIENT_MULTI_RESULTS
 )
 
@@ -48,7 +50,7 @@ dbExecute(con, "SET SQL_SAFE_UPDATES = 0;") # allowing update
 onStop(function() {
   cat("Closing App & Database Connection\n")
   #추후삭제 예정
-  # dbExecute(con, "DELETE FROM testdb.recommend")
+  # dbExecute(con, "DELETE FROM what_to_eatDB.recommend")
   dbDisconnect(con)
   # poolClose(con)
 })
@@ -91,7 +93,6 @@ menuToList <- function(table){
     rec_menu_str <- sapply(rec_menu_str, function(x) paste(x, collapse = ", "))
     
     return(rec_menu_str)
-    
 }
 
 
@@ -101,7 +102,7 @@ priceToList <- function(table){
     price_list_mean <- lapply(price_list_num , mean) 
     rec_price_str <- unname(price_list_mean)
     
-    return(unlist(rec_price_str))
+    return(round(unlist(rec_price_str)))
 }
 
 
@@ -331,4 +332,200 @@ upload_modal<-function(id){
       modalButton("취소")
     )
   )
+}
+
+
+# 업로드 modal
+data_upload_modal<-function(id){
+    ns <- NS(id)
+    modalDialog(
+    title = "Data Add",
+    fluidRow(
+      column(
+    width = 3,
+    style = "margin-top:5px ;",
+    "음식점 명"
+    ),
+    column(
+    width = 9,
+    textInput(
+      inputId = ns("input_res_name"),
+      label = NULL
+    )
+    )
+    ),
+  fluidRow(
+      column(
+    width = 3,
+    "카테고리"
+    ),
+    column(
+    width = 9,
+    checkboxGroupInput(
+      inputId = ns("input_res_category"),
+      label = NULL,
+      choices = c("한식", "양식", "일식", "중식", "배달" , "기타"),
+      selected = NULL,
+      inline = TRUE
+    )
+    )
+    ),
+  fluidRow(
+      column(
+    width = 3,
+    style = "margin-top:5px ;",
+    "네이버 평점"
+    ),
+    column(
+    width = 9,
+    numericInput(
+      inputId = ns("input_res_naver_rating"),
+      label = NULL,
+      value = NULL
+    )
+    )
+    ),
+  fluidRow(
+      column(
+    width = 3,
+    style = "margin-top:5px ;",
+    "위치 (m)"
+    ),
+    column(
+    width = 9,
+    numericInput(
+      inputId = ns("input_res_distance"),
+      label = NULL,
+      value = NULL
+    )
+    )
+    ),fluidRow(
+      column(
+    width = 3,
+    style = "margin-top:5px ;",
+    "Naver URL"
+    ),
+    column(
+    width = 9,
+    textInput(
+      inputId = ns("input_naver_url"),
+      label = NULL
+    )
+    )
+    ),
+  fluidRow(
+        column(
+            width = 3,
+            "메뉴 & 가격",
+      ),
+        column(
+            width = 4,
+            "메뉴"
+        ),
+        column(
+            width = 5,
+            "가격"
+        ),
+    ),
+    fluidRow(
+        column(
+            width = 3,
+            actionButton(
+                inputId = ns("addButton"),
+                label = NULL,
+                icon = icon("plus" , class = "me-1"),
+                class="btn btn-outline-secondary btn-sm",
+                width = "30px",
+                style = "margin-left : 23px; margin-top : 3px;"
+            ),
+            actionButton(
+                inputId = ns("deleteButton"),
+                label = NULL,
+                icon = icon("minus" , class = "me-1"),
+                class="btn btn-outline-secondary btn-sm",
+                width = "30px",
+                style = "margin-top : 3px;"
+            )
+        ),
+        column(
+            width = 4,
+            textInput(
+                inputId = ns("input_res_menu_1"),
+                label = NULL
+            )
+        ),
+        column(
+            width = 4,
+            numericInput(
+                inputId = ns("input_res_price_1"),
+                label = NULL,
+                value = NULL
+            )
+        ),
+    ),
+    fluidRow(
+        id = "space"
+    ),
+    size = "m",
+    easyClose = TRUE,
+    footer = tagList(
+      actionButton(
+        inputId = ns("yes"),
+        label = "확인",
+        class = "btn-primary",
+      ),
+      modalButton("취소")
+    )
+  )
+}
+
+
+#data add row 추가함수
+addNewRow <- function(session ,  wrap_id, i){
+    ns <- session$ns
+    newRowUI <- fluidRow(
+                id = paste0("addRow_",i),
+                column(
+                    width = 3,
+                    actionButton(
+                        inputId = ns(paste0("addButton_",i)),
+                        label = NULL,
+                        icon = icon("plus" , class = "me-1"),
+                        class="btn btn-outline-secondary btn-sm",
+                        width = "30px",
+                        style = "margin-left : 23px; margin-top : 3px;",
+                        class = "sr-only"
+                        
+                    ),
+                    actionButton(
+                        inputId =ns(paste0("deleteButton_",i)),
+                        label = NULL,
+                        icon = icon("minus" , class = "me-1"),
+                        class="btn btn-outline-secondary btn-sm",
+                        width = "30px",
+                        style = "margin-top : 3px;",
+                        class = "sr-only"
+                    )
+                ),
+                column(
+                    width = 4,
+                    textInput(
+                        inputId = ns(paste0("input_res_menu_",i)),
+                        label = NULL
+                    )
+                ),
+                column(
+                    width = 4,
+                    numericInput(
+                        inputId = ns(paste0("input_res_price_",i)),
+                        label = NULL,
+                        value = NULL
+                    )
+                )
+    )
+    insertUI(
+        selector = paste0("#", wrap_id),
+        where = "beforeBegin",
+        ui = newRowUI
+    )
 }

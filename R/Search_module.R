@@ -5,6 +5,7 @@ search_UI <- function(id){
         id = id,
         tags$div(style = "display: flex; justify-content: center; align-items: center;",  # 가운데 정렬 스타일 적용
             fluidRow(style = "width: 500px; background : white; border:2px solid #E8EBEE; border-radius: 10px;",
+                
                 tags$h3(HTML("&nbsp;음식점 검색") , style = "font-weight: bold;"),
                 tags$div(
                     class = "part_line",
@@ -83,11 +84,11 @@ search_UI <- function(id){
                     actionButton(
                         inputId=ns("Done_search") ,
                         label = "검색",
-                        style = "font-weight: bold; background-color:#F27F0E; margin-bottom: 10px;",
-                        width = "20%"
+                        style = "font-weight: bold; ",
+                        width = "20%",
+                        class = "btn btn-success"
                     )
                 ),
-
                 tags$div(
                     class = "part_line",
                     DT::dataTableOutput(
@@ -193,6 +194,7 @@ search_Server <- function(id){
                     
                 ))
             )
+
         })
     })
 }
