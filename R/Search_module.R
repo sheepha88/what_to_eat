@@ -124,7 +124,7 @@ search_Server <- function(id){
             #음식점 검색
             updateSelectInput(
                 inputId = "name" , 
-                choices = res_name_choices
+                choices = dbTable$res$res_name
             )
             #메뉴 검색
             updateSelectInput(

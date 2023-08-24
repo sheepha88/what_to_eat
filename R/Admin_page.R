@@ -200,28 +200,133 @@ Admin_Server <- function(id ){
 
         #음식점 수정
         observeEvent(input$data_edit,{
-            print(rows_num())
             showModal(
-                modalDialog(
-                    title = "음식점 수정",
-                
-                    fluidRow(
-                        tags$p(
-                            "업로드를 진행하시겠습니까?"
-                        )
-                    ),
-                    size = "l",
-                    easyClose = TRUE,
-                    footer = tagList(
-                    actionButton(
-                        inputId = ns("edit"),
-                        label = "수정",
-                        class = "btn-primary",
-                    ),
-                    modalButton("취소")
-                    )
-                )
+                data_edit_modal(id)
             )
+
+            #음식점 이름
+            updateTextInput(
+                inputId = "edit_res_name",
+                value = df_res[id==rows_num() , res_name]
+            )
+
+            #음식점 카테고리
+            selected_list = df_res[id==rows_num() , category]
+            updateCheckboxGroupInput(
+                inputId = "edit_res_category",
+                choices = c("한식", "양식", "일식", "중식", "배달" , "기타"),
+                selected = case_when(
+                                grepl(",", selected_list) ~ unlist(strsplit(selected_list, ",")),
+                                TRUE ~ selected_list
+                            )
+            )
+
+            #네이버 평점
+            updateNumericInput(
+                inputId = "edit_res_naver_rating",
+                value = df_res[id==rows_num() , rating_naver],
+                max = 5L
+            )
+
+            #위치
+            updateNumericInput(
+                inputId = "edit_res_distance",
+                value = df_res[id==rows_num() , distance]
+            )
+
+            #네이버 URL
+            updateNumericInput(
+                inputId = "edit_naver_url",
+                value = df_res[id==rows_num() , url_naver]
+            )
+
+
+            #메뉴 , 가격
+            edit_menu_num <- length(unlist(strsplit(df_res[id==rows_num() , menu] , ",")))-1
+            edit_num <- reactiveVal(edit_menu_num)
+            output$edit_UI <- renderUI({
+                if(edit_num()!=0){
+                    tags <- lapply(seq(edit_menu_num), function(i) {
+                        fluidRow(
+                            id = paste0("edit_addRow_",i+1),
+                            column(
+                                width = 3,
+                                actionButton(
+                                    inputId = ns(paste0("edit_addButton_",i+1)),
+                                    label = NULL,
+                                    icon = icon("plus" , class = "me-1"),
+                                    class="btn btn-outline-secondary btn-sm",
+                                    width = "30px",
+                                    style = "margin-left : 23px; margin-top : 3px;",
+                                    class = "sr-only"
+                                    
+                                ),
+                                actionButton(
+                                    inputId =ns(paste0("edit_deleteButton_",i+1)),
+                                    label = NULL,
+                                    icon = icon("minus" , class = "me-1"),
+                                    class="btn btn-outline-secondary btn-sm",
+                                    width = "30px",
+                                    style = "margin-top : 3px;",
+                                    class = "sr-only"
+                                )
+                            ),
+                            column(
+                                width = 4,
+                                textInput(
+                                    inputId = ns(paste0("edit_input_res_menu_",i+1)),
+                                    label = NULL
+                                )
+                            ),
+                            column(
+                                width = 4,
+                                numericInput(
+                                    inputId = ns(paste0("edit_input_res_price_",i+1)),
+                                    label = NULL,
+                                    value = NULL
+                                )
+                            )
+                        )
+
+                    })
+                    
+                }
+                    
+            })
+
+            
+            #menu , 가격 display
+            edit_menu <- unlist(strsplit(df_res[id==rows_num() , menu] , ","))
+            test <- reactiveVal(edit_menu)
+            print(edit_menu[3])
+
+            
+            lapply( seq(length(edit_menu)), function(x){
+                    print(edit_menu[x])
+                    updateTextInput(
+                        inputId = paste0("edit_input_res_menu_",x),
+                        value = edit_menu[x]
+                    )
+            })
+
+
+            #행추가
+            observeEvent(input$edit_addButton,{
+                addNewRow(
+                    session = session,
+                    wrap_id = "edit_space",
+                    i = edit_num()+1
+                )
+                edit_num(edit_num()+1L)
+            })
+
+            #modal에서 메뉴가격 행 삭제
+            observeEvent(input$edit_deleteButton,{
+                req(input$edit_deleteButton, edit_num() >= 1L)
+                removeUI( selector = paste0("#edit_addRow_",edit_num()+1L) )
+                edit_num( edit_num() - 1L )
+            })
         })
     }
 )}
+
