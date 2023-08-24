@@ -113,24 +113,25 @@ priceToList <- function(table){
 # db table가져오기 ----------------------------------------------------------------------------------- 기
 getDBTable<-function(){
     # 음식점  테이블 출력
-    sql_res <- "select * from res;"
+    #deleted = 1 : admin page에서 삭제처리하지 않은 것만 추출
+    sql_res <- "SELECT * FROM res WHERE deleted = 1;"
     df_res <- dbGetQuery(con, sql_res) |> data.table()
     
     # 사용자 테이블 출력
-    sql_user <- "select * from user;"
+    sql_user <- "SELECT * FROM user;"
     df_user <- dbGetQuery(con, sql_user) |> data.table()
 
     
     # review 테이블 출력
-    sql_review <- "select * from review;"
+    sql_review <- "SELECT * FROM review;"
     df_review <- dbGetQuery(con, sql_review) |> data.table()
 
     # recommend 테이블 출력
-    sql_recommend <- "select * from recommend;"
+    sql_recommend <- "SELECT * FROM recommend;"
     df_recommend <- dbGetQuery(con, sql_recommend) |> data.table()
 
     # image 테이블 출력
-    sql_image <- "select * from image;"
+    sql_image <- "SELECT * FROM image;"
     df_image <- dbGetQuery(con, sql_image) |> data.table()
 
     #음식점 이름 , 카테고리 , 메뉴 반환
@@ -528,4 +529,30 @@ addNewRow <- function(session ,  wrap_id, i){
         where = "beforeBegin",
         ui = newRowUI
     )
+}
+
+
+
+# 삭제 modal
+delete_modal<-function(id){
+    ns <- NS(id)
+    modalDialog(
+    title = "경고",
+  
+    fluidRow(
+      tags$p(
+        "삭제 하시겠습니까?"
+      )
+    ),
+    size = "m",
+    easyClose = TRUE,
+    footer = tagList(
+      actionButton(
+        inputId = ns("delete_yes"),
+        label = "확인",
+        class = "btn-primary",
+      ),
+      modalButton("취소")
+    )
+  )
 }

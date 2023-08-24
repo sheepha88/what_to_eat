@@ -112,10 +112,6 @@ Admin_Server <- function(id ){
                 )) ,  selection = 'none'
         )
 
-
-            
-        
-
         #modal open
         observeEvent(input$data_upload,{
             showModal(data_upload_modal(id = id))
@@ -176,9 +172,6 @@ Admin_Server <- function(id ){
             removeModal()
         })
 
-
-
-
         #음식점 삭제
         ##데이터 행 선택 후 선택된 값 저장
         rows_num <- reactiveVal(0L)
@@ -187,8 +180,13 @@ Admin_Server <- function(id ){
             rows_num(as.vector(unlist(df_res[ rows, "id"])))
         })
 
-
         observeEvent(input$data_delete,{
+            showModal(
+                delete_modal(id)
+            )
+        })
+
+        observeEvent(input$delete_yes,{
             print(rows_num())
             static_rows_num <- paste0(rows_num() , collapse = ",")
             sql_script <- glue("
@@ -197,6 +195,7 @@ Admin_Server <- function(id ){
             # send query to MySQL
             dbExecute(con, sql_script)
             print("삭제완료")
+            removeModal()
         })
 
         #음식점 수정
