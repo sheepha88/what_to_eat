@@ -1,21 +1,30 @@
 server <- function(input, output, session) {
 	#새로고침 버튼 타 모듈에서 이용을 위해 isolate
 
+	
+
 	isolate({
-			session$userData[["refreshClicked"]] <- reactiveVal(0L)
-			session$userData[["user_id"]] <- 1L # needs to be updated
-			session$userData[["dbTable"]] <- getDBTable() #Table 전부 다 가져오는 함수
-			session$userData[["review_res_id"]] <- reactiveVal() #리뷰쓰려고하는 음식점
-			
+		dbTable <- reactiveVal()
+
+		session$userData[["refreshClicked"]] <- reactiveVal(0L)
+		session$userData[["user_id"]] <- 1L # needs to be updated
+		session$userData[["dbTable"]] <- getDBTable() #Table 전부 다 가져오는 함수
+		session$userData[["review_res_id"]] <- reactiveVal() #리뷰쓰려고하는 음식점
+
+		session$userData[["table_reload"]] <- reactiveVal(1L)
 	})
 
-	# 미래구조
-	# db_table <- dataModule_Server("data_module", trigger) trogger = 로그인했을때
-	# module_1("module1", db_table)
-	# module_2("module2", db_table)
-	
-	
+	observeEvent(input$refreshDB, {
+		print("executed")
+		session$userData[["dbTable"]] <- getDBTable()
+		dbTable(getDBTable())
+	})
 
+	#db tables
+	db_table <- db_table_Server("data_module", trigger = session$userData[["table_reload"]] )
+	
+	#Admin
+	Admin_Server("Admin", db_table = db_table)
 
 	#HOME tab_server
 	food_rec_Server("food_rec", parent = session)
@@ -28,13 +37,6 @@ server <- function(input, output, session) {
 
 	#reivew , 평점 tab_server
 	review_Server("Review"  , parent = session)
-
-	#Admin
-	Admin_Server("Admin")
-
-
-
-       
 
 }
 

@@ -69,6 +69,7 @@ food_rec_Server <- function(id, parent){
             # 음식점 정보 랜덤으로 테이블 출력 (연속 중복 X)
             sql_1 <- "SELECT * FROM res;"
             df_res <- dbGetQuery(con, sql_1) |> as.data.table()
+            
             random_num <- sample(df_res$id, 1 , replace = FALSE) |> as.integer() 
            
 

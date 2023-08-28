@@ -1,6 +1,7 @@
 ui <- fluidPage(
   useShinyjs(),
   includeScript("www/custom.js"),
+  includeCSS("www/styles.css"),
 
   theme = bs_theme(version = 5),
 
@@ -71,7 +72,7 @@ ui <- fluidPage(
             tags$h1(
                 "What to eat",
                 class = "custom-font",
-                actionButton("showNavbarButton","" , style = "float: left; background-color: #00BFE5;"  , class = "my-button" , icon = icon("bars", class = "my-icon") ),  
+                
             ),
             tags$div(style = "background-color : #FAFBFC;",
                 navbarPage(
