@@ -14,7 +14,7 @@ food_rec_UI <- function(id){
                     inputId = ns("refreshButton"), 
                     label = NULL,
                     icon = icon("refresh", class = "refresh-icon"),
-                    class = "my-button",  
+                    class = "my-button mt-2 mb-2",  
                 )
             ),
             tags$span(
@@ -27,12 +27,12 @@ food_rec_UI <- function(id){
                 class = "space"
             ),
             tags$span(
-                tags$h4( style = "font-size:15px; margin-left: 10px;" ,
+                tags$h4( 
                     actionLink(inputId = ns("rec_modal") , label = "자세히보기")
                 )   
             ),
             tags$span(
-                tags$h4( style = "font-size:15px; margin-left: 10px;" ,
+                tags$h4( 
                     actionLink(
                         inputId = ns("go_review"),
                         label = "리뷰쓰기"
@@ -88,7 +88,7 @@ food_rec_Server <- function(id, parent){
             # 추천음식점의 카테고리 출력
             rec_category <- df_res_row$category
             output$res_category <- renderUI({
-                tags$h4("카테고리 : ", rec_category , style = "margin-left: 10px; font-size:15px;")
+                tags$h6("카테고리 : ", rec_category , style = "font-size:15px;")
             })
 
             # 추천음식점의 메뉴 출력
@@ -97,7 +97,7 @@ food_rec_Server <- function(id, parent){
             rec_menu_str <- names(menu_list) |> paste(collapse = ",")
            
             output$rec_menu <- renderUI({
-                tags$h4("메뉴 : ", rec_menu_str , style = "font-size:15px; margin-left: 10px;")
+                tags$h6("메뉴 : ", rec_menu_str , style = "font-size:15px;")
             })
 
             # 추천음식점의 평점 출력

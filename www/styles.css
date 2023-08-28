@@ -1,5 +1,19 @@
+/* body{
+    font-size: .7rex;
+} */
+
+.part_line {
+    border-top: 1px solid #E8EBEE; 
+    padding-top: 5px;
+    margin-left: 1px;
+}
 
 .admin-button-style {
     margin-right: 10px;
     width: 18%;
 }
+
+h4{
+    font-size: .8rex;
+}
+ 

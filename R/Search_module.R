@@ -3,101 +3,95 @@ search_UI <- function(id){
     ns <- NS(id)
     fluidPage(
         id = id,
-        tags$div(style = "display: flex; justify-content: center; align-items: center;",  # 가운데 정렬 스타일 적용
-            fluidRow(style = "width: 500px; background : white; border:2px solid #E8EBEE; border-radius: 10px;",
+        class = "bg-white",
+        
+        fluidRow(
+            # style = "width: 500px; background : white; border:2px solid #E8EBEE; border-radius: 10px;",
+            class = "bg-white",
+            style = "border:2px solid #E8EBEE; border-radius: 10px; ",
+            tags$h3(
+                HTML("&nbsp;음식점 검색") ,
+                style = "font-weight: bold;",
+                class = "mt-2 mb-2"
+            ),
+            fluidRow(
+                class = "part_line",
+                tags$h5("음식점 명", class = "mt-2 mb-2" ),
+                selectInput(
+                    inputId = ns("name") , 
+                    label = NULL , 
+                    width = "95%",
+                    choices = NULL,
+                    selected = NULL,
+                    multiple = TRUE
+                )
+            ),
+            fluidRow(
+                class = "part_line",
+                tags$h5("카테고리", class = "mt-2 mb-3"),
+                checkboxGroupInput(
+                    inputId = ns("category") , label = NULL,
+                    choices = c("한식", "양식", "일식", "중식", "배달" , "기타"),
+                    selected = NULL 
+                )
                 
-                tags$h3(HTML("&nbsp;음식점 검색") , style = "font-weight: bold;"),
-                tags$div(
-                    class = "part_line",
-                    tags$h4(
-                        "음식점 명", style = "margin-left: 10px; margin-bottom: 0px; " , 
+            ),
+            fluidRow(
+                class = "part_line",
+                tags$h5(
+                    "메뉴",  class = "mt-2 mb-3",
+                    uiOutput(ns("menu")) 
+                ),
+                selectInput(
+                    inputId = ns("menu") , 
+                    label = NULL , 
+                    width = "95%",
+                    choices = NULL,
+                    selected = NULL,
+                    multiple = TRUE
+                )
+            ),
+            fluidRow(
+                class = "part_line",
+                tags$h5("평점", class = "mt-2 mb-3",
+                    tags$div(style = "font-size : 13px;",
+                    checkboxGroupInput(inputId = ns("score"), label = NULL ,  choices = c("TI" , "네이버") , inline=TRUE , selected = NULL )
                     ),
-                    tags$div(
-                        style = "margin-left: 10px;",
-                        selectInput(
-                            inputId = ns("name") , 
-                            label = NULL , 
-                            width = "95%",
-                            choices = NULL,
-                            selected = NULL,
-                            multiple = TRUE
-                        )
-                    )
-                ),
-                tags$div(
-                    class = "part_line",
-                    tags$h4(
-                        "카테고리", style = "margin-left: 10px; margin-bottom: 0px;",
-                    ),
-                    tags$div(style = "margin-left:10px; ",
-                        checkboxGroupInput(
-                            inputId = ns("category") , label = NULL,
-                            choices = c("한식", "양식", "일식", "중식", "배달" , "기타"),
-                            selected = NULL 
-                        )
-                    )
-                ),
-                tags$div(
-                    class = "part_line",
-                    tags$h4(
-                        "메뉴", style = "margin-left: 10px; margin-bottom: 0px;",
-                        uiOutput(ns("menu")) 
-                    ),
-                    tags$div(
-                        tags$div(
-                            style = "margin-left: 10px;",
-                            selectInput(
-                                inputId = ns("menu") , 
-                                label = NULL , 
-                                width = "95%",
-                                choices = NULL,
-                                selected = NULL,
-                                multiple = TRUE
-                            )
-                        )   
-                    )
-                ),
-                tags$div(
-                    class = "part_line",
-                    tags$h4("평점", style = "margin-left: 10px; margin-bottom: 0px;",
-                        tags$div(style = "font-size : 13px;",
-                        checkboxGroupInput(inputId = ns("score"), label = NULL ,  choices = c("TI" , "네이버") , inline=TRUE , selected = NULL )
-                        ),
-                    sliderInput(inputId = ns("score_range") , label = NULL , min = 0L , max = 5L , value=c(0L,0L) , step = 0.5L, width = "95%")    
-                    )
-                ),
-                tags$div(
-                    class = "part_line",
-                    tags$h4("가격", style = "margin-left: 10px; margin-bottom: 0px;",
-                    sliderInput(inputId = ns("price_range") , label = NULL , min = 0L , max = 50000L , value=0L , step = 1000L, width = "95%")
-                    )
-                ),
-                tags$div(
-                    class = "part_line",
-                    tags$h4("위치(m)", style = "margin-left: 10px; margin-bottom: 0px;",
-                    sliderInput(inputId = ns("distance_range") , label = NULL , min = 0L , max = 2000L , value=0L , step = 100L, width = "95%")
-                    )
-                ),
-                tags$div(
-                    class = "part_line",
-                    style = "text-align: center; margin-bottom: 0px; ",
-                    actionButton(
-                        inputId=ns("Done_search") ,
-                        label = "검색",
-                        style = "font-weight: bold; ",
-                        width = "20%",
-                        class = "btn btn-success"
-                    )
-                ),
-                tags$div(
-                    class = "part_line",
-                    DT::dataTableOutput(
-                    ns("table")
-                    )
+                sliderInput(inputId = ns("score_range") , label = NULL , min = 0L , max = 5L , value=c(0L,0L) , step = 0.5L, width = "95%")    
+                )
+            ),
+            fluidRow(
+                class = "part_line",
+                tags$h5("가격", class = "mt-2 mb-3",
+                sliderInput(inputId = ns("price_range") , label = NULL , min = 0L , max = 50000L , value=0L , step = 1000L, width = "95%")
+                )
+            ),
+            fluidRow(
+                class = "part_line",
+                tags$h5("위치(m)", class = "mt-2 mb-3",
+                sliderInput(inputId = ns("distance_range") , label = NULL , min = 0L , max = 2000L , value=0L , step = 100L, width = "95%")
+                )
+            ),
+            fluidRow(
+                class = "part_line",
+                style = "justify-content: center; margin-bottom : 5px;",
+                actionButton(
+                    inputId=ns("Done_search") ,
+                    label = "검색",
+                    style = "font-weight: bold; ",
+                    width = "20%",
+                    class = "btn btn-success"
+                )
+            ),
+            fluidRow(
+                class = "part_line",
+                DT::dataTableOutput(
+                ns("table")
                 )
             )
         )
     )
+    
 }
 
 

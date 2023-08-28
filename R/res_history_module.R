@@ -62,36 +62,46 @@ res_his_Server <- function(id , parent){
                             style = "border: 1px solid black; border-radius: 10px; 
                             background-color: #2F5597; padding: 10px; 
                             margin-top: 10px; margin-bottom: 10px;  margin-right: 10px;",
-                            column(
-                                width = 8,
-                                tags$div(
-                                style = "color: white;",
-                                paste("•    ",  df_his[i,"res_name"] ," / ", df_his[i,"category"] , "/" , df_his[i,"menu"] )
-                                )   
-                            ),
-                            column(
-                                width = 2,
-                                tags$div(
-                                    tags$h4( style = "font-size:15px; margin-left: 10px;" ,
-                                        actionLink(
-                                            inputId = ns(paste0("rec_modal_",i)) ,
-                                            label = "자세히보기",
-                                            class = "modal_class",
-                                            onclick = glue("viewDetail({res_id})")
-                                        )
-                                    )
+                            fluidRow(
+                                column(
+                                    width = 12,
+                                    style = "color: white;",
+                                    paste("•    ",  df_his[i,"res_name"] ," / ", df_his[i,"category"] , "/" , df_his[i,"menu"] )
                                 )
                             ),
-                            column(
-                                width = 2,
-                                tags$div(
+                            fluidRow(
+                                  actionLink(
+                                        inputId = ns(paste0("rec_modal_",i)),
+                                        label = "자세히보기",
+                                        onclick = glue("viewDetail({res_id})")
+                                    ),
                                     actionLink(
-                                        inputId = ns(paste0("go_review_",i)) ,
+                                        inputId = ns(paste0("go_review_",i)),
                                         label = "리뷰쓰기",
                                         onclick = glue("viewReview({res_id})")
                                     )
-                                )
+
+                                # column(
+                                #     width = 3,
+                                #     style = "width:50%",
+                                #     actionLink(
+                                #         inputId = ns(paste0("rec_modal_",i)),
+                                #         label = "자세히보기",
+                                #         onclick = glue("viewDetail({res_id})")
+                                #     )
+                                # ),
+                                # column(
+                                #     width = 3,
+                                #     style = "width:50%",
+                                #     actionLink(
+                                #         inputId = ns(paste0("go_review_",i)),
+                                #         label = "리뷰쓰기",
+                                #         onclick = glue("viewReview({res_id})")
+                                #     )
+                                # )
                             )
+
+                            
                         )
                     })
 

@@ -3,7 +3,7 @@ ui <- fluidPage(
   includeScript("www/custom.js"),
   includeCSS("www/styles.css"),
 
-  theme = bs_theme(version = 5),
+  theme = bs_theme(version = 5, font_scale = .8),
 
 
   #HTML function 지정
@@ -60,48 +60,46 @@ ui <- fluidPage(
                 height: auto;
                 display: inline-block;
             }
-            .part_line {
-                border-top: 1px solid #E8EBEE; 
-                padding-top: 5px;
-            }
+
         ")
     ),
 
     fluidRow(
-        tags$div(
-            tags$h1(
-                "What to eat",
-                class = "custom-font",
-                
+        tags$h1(
+            "What to eat",
+            class = "custom-font",
+            position = "fixed-top"
+        )
+    ),
+    fluidRow(
+    tags$div(style = "background-color : #FAFBFC;",
+        navbarPage(
+            id = "navbarPage",
+            title = "What to eat",
+            
+            #Home page
+            tabPanel("Home",
+                home_UI("Home")
             ),
-            tags$div(style = "background-color : #FAFBFC;",
-                navbarPage(
-                    id = "navbarPage",
-                    title = "What to eat",
-                    
-                    #Home page
-                    tabPanel("Home",
-                        home_UI("Home")
-                    ),
-                    tabPanel("음식점 검색",
-                        search_UI("Search")
-                    ),
-                    tabPanel(
-                        title = "평점 & 리뷰작성",
-                        value = "rating",
-                        review_UI("Review")
-                    ),
-                    tabPanel(
-                        title = "ADMIN",
-                        value = "Admin",
-                        Admin_UI("Admin")
-                    )
-                ),
-                class = "navbar_class",
-                # style="display: none"
+            tabPanel("음식점 검색",
+                search_UI("Search")
+            ),
+            tabPanel(
+                title = "평점 & 리뷰작성",
+                value = "rating",
+                review_UI("Review")
+            ),
+            tabPanel(
+                title = "ADMIN",
+                value = "Admin",
+                Admin_UI("Admin")
             )
         ),
-
+        class = "navbar_class",
+        # style="display: none"
+    )
+    )
+       
         # [delete]
         # actionButton(
         #     inputId = "go_to_rating",
@@ -109,8 +107,8 @@ ui <- fluidPage(
         #     class = "btn-danger"
         # )
         
-    )
 )
+
 
 
 

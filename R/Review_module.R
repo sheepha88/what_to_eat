@@ -5,7 +5,7 @@ review_UI <- function(id ){
         id = id,
         tags$div(style = "display: flex; justify-content: center; align-items: center;",  # 가운데 정렬 스타일 적용
             fluidRow(style = "width: 500px; background : white; border:2px solid #E8EBEE; border-radius: 10px;",
-                tags$h3(HTML("&nbsp;평점 & 리뷰작성") , style = "font-weight: bold;"),
+                tags$h3(HTML("&nbsp;평점 & 리뷰작성") , style = "font-weight: bold;",class = "mt-2 mb-2"),
                 tags$div(
                     class = "part_line",
                     fluidRow(
