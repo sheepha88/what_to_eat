@@ -1,4 +1,9 @@
 # ------------------------------------------------------------------------------------------------ #
+# 글로벌 옵션                                                                                           #
+# ------------------------------------------------------------------------------------------------ 션
+options(digits.secs = 6)  
+
+# ------------------------------------------------------------------------------------------------ #
 # library                                                                                          #
 # ------------------------------------------------------------------------------------------------ #
 library(shinyjs)
@@ -310,11 +315,15 @@ modal_ui_file <- function(session , rec_res_id){
 
 #  리뷰쓰기로 이동하기
 go_review_server <- function( session  , review_res_id ){
+
+    session$userData[["review_with_res_id"]](1L)
+    
     updateTabsetPanel(
         session = session,
         inputId = "navbarPage",
         selected = "rating"
     )
+
     session$userData[["review_res_id"]](review_res_id)
 }
 

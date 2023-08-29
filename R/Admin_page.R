@@ -88,7 +88,7 @@ Admin_Server <- function(id, db_table){
             df_res <- df_res[,.(id ,res_name ,category , menu , price ,  rating_naver, url_naver , distance)]
             
             df_res[["Select"]]<-glue::glue(
-                '<input type="checkbox" name="', ns("selected"), '"  value="{1:nrow(df_res)}"><br>'
+                '<input type="checkbox" name="', ns("selected"), '"  value="{1:nrow(df_res)}" class = "mt-2"><br>'
             )
             df_res <- df_res[,c(9,1,2,3,4,5,6,7,8)]
 

@@ -44,7 +44,7 @@ food_rec_UI <- function(id){
 
 # server ----------------------------------------------------------------------------------------- #
 ##parent : main 서버의 session을 modal함수의 인자로 받을때 쓰기 위해
-food_rec_Server <- function(id, parent){
+food_rec_Server <- function(id, parent , db_table){
     moduleServer(id , function(input , output , session){
         ns <- session$ns
         #modal
@@ -60,17 +60,17 @@ food_rec_Server <- function(id, parent){
         # 1) DB에서 추천 음식점 정보 Loading
         # 2) 추천 음식점 정보 reactiveVal로 변환 -> UI는 reactiveVal의 값 변화에 대응하여 업데이트 되므로
 
-        recommendRestaurant <- function() {
+        recommendRestaurant <- function(db_table) {
             # 음식점 정보 랜덤으로 테이블 출력 (연속 중복 X)
-            sql_1 <- "SELECT * FROM res;"
-            df_res <- dbGetQuery(con, sql_1) |> as.data.table()
+            
+            df_res <- db_table()$res
             
             random_num <- sample(df_res$id, 1 , replace = FALSE) |> as.integer() 
            
 
             # 랜덤으로 출력된 Id에 해당하는 restaurant 테이블 출력
-            sql_2 <- glue("SELECT * FROM res WHERE id = {random_num};")
-            df_res_row <- dbGetQuery(con, sql_2) |> as.data.table()
+           
+            df_res_row <- df_res[ id==random_num ,]
             rec_name <- df_res_row$res_name # 음식점이름 변수 : res_name
             resName(rec_name)
             # [old way]
@@ -133,27 +133,43 @@ food_rec_Server <- function(id, parent){
         })
         
         # 추천 레스토랑 정보 from DB
-        res_info <- recommendRestaurant()
-        recommend_res_info( res_info )
+        observeEvent(db_table(),{
+            print("ghkrdls")
+            req(db_table())
+            res_info <- recommendRestaurant(db_table)
+            print(res_info)
+            recommend_res_info(res_info)
+            print("확인")
+            print(recommend_res_info())
+            created <- lubridate::now() |> format(x =_, "%Y-%m-%d %H:%M:%S.%S3")
+            user_id <- session$userData[["user_id"]]
+            res_id <-  recommend_res_info()$res_id
+            print(res_id)
 
-        created <- lubridate::now() |> format(x =_, "%Y-%m-%d %H:%M:%S.%S3")
-        user_id <- session$userData[["user_id"]]
-        res_id <-  res_info$res_id
+            # step2: script 생성
+            sql_script <- glue("
+                INSERT INTO what_to_eatDB.recommend (user_id, res_id, created) VALUES(
+                    {user_id}, {res_id}, '{created}'
+                );
+            ")
 
-        # step2: script 생성
-        sql_script <- glue("
-            INSERT INTO what_to_eatDB.recommend (user_id, res_id, created) VALUES(
-                {user_id}, {res_id}, '{created}'
-            );
-        ")
-
-        # step3: send query to MySQL
-        # recommend 테이블에 추천 음식점 기록
-        dbExecute(con, sql_script)
+            # step3: send query to MySQL
+            # recommend 테이블에 추천 음식점 기록
+            dbExecute(con, sql_script)
 
 
-        #dbtable 가져오기
-        dbTable <- session$userData[["dbTable"]]
+
+        })
+        
+        
+
+        
+ 
+
+
+
+        # #dbtable 가져오기
+        # dbTable <- session$userData[["dbTable"]]
             
 
         
@@ -164,7 +180,7 @@ food_rec_Server <- function(id, parent){
             # 추천음식점 기록
             # 추천음식점 출력 함수 반환값 변수지정
             # 랜덤 추천음식점 출력
-            recommend_res_info(recommendRestaurant())
+            recommend_res_info(recommendRestaurant(db_table))
             
 
             
@@ -180,7 +196,7 @@ food_rec_Server <- function(id, parent){
 
             # #새로고침 누르면 DB(recommend table)에 전 추천음식점 정보 업로드
             # step1: column value 생성
-            created <- lubridate::now() |> format(x =_, "%Y-%m-%d %H:%M:%S.%S3")
+            created <- as.character(Sys.time()) # lubridate::now() |> format(x =_, "%Y-%m-%d %H:%M:%S.%S3")
             user_id <- session$userData[["user_id"]]
             res_id <-  recommend_res_info()[["res_id"]]
 

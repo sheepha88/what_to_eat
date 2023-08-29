@@ -16,21 +16,12 @@ review_UI <- function(id){
             ),
             fluidRow(
                 class = "part_line",
-                # tags$h5("음식점 선택", class = "mt-2 mb-2" ),
-                # fluidRow(
-                #     column(
-                #         width = 12,
-                #         selectInput(
-                #             inputId = ns("review_res_list") , 
-                #             label = NULL,
-                #             choices = NULL,
-                #             selected = NULL,
-                #         )
-                #     )
-                # ),
-                tags$h4(
-                    textOutput(outputId = ns("review_res_name_output")),
-                    style = "text-align:center;"
+                tags$h5("음식점 선택", class = "mt-2 mb-2" ),
+                selectInput(
+                    inputId = ns("review_res_list") , 
+                    label = NULL,
+                    choices = NULL,
+                    width = "100%"
                 )
             ),
             fluidRow(
@@ -150,66 +141,87 @@ review_Server <- function(id, parent, db_table){
         })
 
         dbTable <- session$userData[["dbTable"]]
-
+    
 
         #음식점 리스트 
+        navbar_reactive <- reactiveVal(0)
         observeEvent(parent$input$navbarPage, {
+            # print(parent$input$navbarPage)
+            
+            req(parent$input$navbarPage == "rating", db_table(), session$userData[["review_with_res_id"]]() == 0L)
+            navbar_reactive(navbar_reactive()+1)
 
-            req(parent$input$navbarPage == "rating", db_table())
-
-            ### 음식점 리스트 받기 from DB
+            ## 음식점 리스트 받기 from DB
+            res_list <- db_table()$res$res_name
             res_list <- c("", as.character(db_table()$res$id))
             names(res_list) <- c("", db_table()$res$res_name)
-
-            ### 음식점 선택 UI 업데이트: 리스트 추가
-            # updateSelectInput(
-            #     inputId = "review_res_list",
-            #     choices = res_list
-            # )
-
-        })
-
-
-        #음식점이름 출력
-        res_id <- reactiveVal()
-        observeEvent(session$userData[["review_res_id"]](), {
-
-            # print(session$userData[["review_res_id"]]())
-            # print(db_table()$res)
-
-            # req( db_table(), session$userData[["review_res_id"]]() %in% db_table()$res$id )
-
-            # cat("-\n")
-            # print(session$userData[["review_res_id"]]())
+            # print(res_list)
             
-            # ### 음식점 리스트 받기 from DB
-            # res_list <- c("", as.character(db_table()$res$id))
-            # names(res_list) <- c("", db_table()$res$res_name)
-            
-            # ### 음식점 선택 UI 업데이트: 선택 추가
-            # updateSelectInput(
-            #     inputId = "review_res_list",
-            #     choices = res_list,
-            #     selected = as.character( session$userData[["review_res_id"]]() )
-            # )
-            
-            res_id(session$userData[["review_res_id"]]())
+            ## 음식점 선택 UI 업데이트: 리스트 추가
+            updateSelectInput(
+                session,
+                inputId = "review_res_list",
+                selected = NULL,
+                choices = res_list
+            )
 
-            #id값으로 음식점 출력
-            review_res_name <- dbTable$res[dbTable$res$id==res_id(),"res_name"]
-            
-            #rendering
-            output$review_res_name_output <- renderText(unlist(review_res_name))
-
-        })
-
-
-        #참석자
-        participants_list <- unlist(dbTable$user$username)
-        updateSelectInput(
+            ## 참석자 리스트
+            participants_list <- db_table()$user$username
+            updateSelectInput(
                 inputId = "participants" , 
                 choices = participants_list
             )
+
+        })
+
+
+        #음식점이름 출력        
+        observeEvent(session$userData[["review_res_id"]](), {
+            
+            req(session$userData[["review_res_id"]]() %in% db_table()$res$id, session$userData[["review_with_res_id"]]() == 1L)
+            
+            ### 음식점 리스트 받기 from DB
+            res_list <- db_table()$res$res_name
+            res_list <- c("", as.character(db_table()$res$id))
+            names(res_list) <- c("", db_table()$res$res_name)
+
+            ## 음식점 선택 UI 업데이트: 리스트 추가 및 선택
+            updateSelectInput(
+                session,
+                inputId = "review_res_list",
+                choices = res_list,
+                selected = as.character(session$userData[["review_res_id"]]())
+            )
+
+            ## 참석자 리스트
+            participants_list <- db_table()$user$username
+            updateSelectInput(
+                inputId = "participants" , 
+                choices = participants_list
+            )
+
+
+            
+            # res_id(session$userData[["review_res_id"]]())
+
+            #id값으로 음식점 출력
+            # review_res_name <- dbTable$res[dbTable$res$id==res_id(),"res_name"]
+            
+            # #rendering
+            # output$review_res_name_output <- renderText(unlist(review_res_name))
+
+            # res_list <- db_table()$res$res_name
+            # print(res_list)
+            # print(session$userData[["review_res_id"]]())
+            # updateSelectInput(
+            #     session,
+            #     inputId = "review_res_list",
+            #     choices = res_list,
+            #     selected = ifelse(navbar_reactive()=="rating" , NULL , unlist(review_res_name))
+                
+            # )
+        })
+        
         #평점
         output$star_rating <- renderText({paste("No. of stars : ", input$star)})
 
@@ -249,7 +261,7 @@ review_Server <- function(id, parent, db_table){
         observeEvent(input$yes , {
             removeModal()
 
-            res_id <- as.integer(res_id())
+            res_id <- as.integer(input$review_res_list)
             user_id <- session$userData[["user_id"]]
             visit_date <- as.Date(input$date_visit)
             participants <- paste(input$participants , collapse =  ",")

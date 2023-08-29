@@ -9,7 +9,9 @@ server <- function(input, output, session) {
 		session$userData[["refreshClicked"]] <- reactiveVal(0L)
 		session$userData[["user_id"]] <- 1L # needs to be updated
 		session$userData[["dbTable"]] <- getDBTable() #Table 전부 다 가져오는 함수
+		
 		session$userData[["review_res_id"]] <- reactiveVal() #리뷰쓰려고하는 음식점
+		session$userData[["review_with_res_id"]] <- reactiveVal(0L) 
 
 		session$userData[["table_reload"]] <- reactiveVal(1L)
 	})
@@ -37,6 +39,19 @@ server <- function(input, output, session) {
 
 	#reivew , 평점 tab_server
 	review_Server("Review"  , parent = session, db_table = db_table)
+
+
+
+	#리뷰 with 레스토랑 아이디 indicator 초기화
+	observeEvent(input$navbarPage, {
+
+		req(input$navbarPage)
+		# cat("Current page: ", input$navbarPage, fill = TRUE)
+		if ( input$navbarPage != "rating" ){
+			session$userData[["review_with_res_id"]](0L)
+		}
+
+	})
 
 }
 
