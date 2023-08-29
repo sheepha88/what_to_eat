@@ -4,9 +4,9 @@ res_his_UI <- function(id){
     
     fluidPage(
         id = id,
-        fluidRow(
-                uiOutput(ns("rec_his_bar"))
-        )    
+
+        uiOutput(ns("rec_his_bar"))
+
     )
 }
 
@@ -57,29 +57,40 @@ res_his_Server <- function(id , parent){
 
                         res_id <- df_his[i, "res_id"]
 
+                        tagList(
+
                         fluidRow(
-                            class = "dynamic-div",
+                            class = "dynamic-div pe-0",
                             style = "border: 1px solid black; border-radius: 10px; 
                             background-color: #2F5597; padding: 10px; 
                             margin-top: 10px; margin-bottom: 10px;  margin-right: 10px;",
                             fluidRow(
                                 column(
                                     width = 12,
-                                    style = "color: white;",
+                                    class = "text-white",
                                     paste("•    ",  df_his[i,"res_name"] ," / ", df_his[i,"category"] , "/" , df_his[i,"menu"] )
                                 )
                             ),
                             fluidRow(
-                                  actionLink(
+                                class = "mt-1 me-0 pe-0 text-end",
+                                column(
+                                    width = 6,
+                                    offset = 6,
+                                    class = "pe-0",
+                                    actionLink(
                                         inputId = ns(paste0("rec_modal_",i)),
                                         label = "자세히보기",
+                                        class = "pe-1 text-beige",
                                         onclick = glue("viewDetail({res_id})")
                                     ),
                                     actionLink(
                                         inputId = ns(paste0("go_review_",i)),
                                         label = "리뷰쓰기",
+                                        class = "text-beige",
                                         onclick = glue("viewReview({res_id})")
                                     )
+                                )
+
 
                                 # column(
                                 #     width = 3,
@@ -103,10 +114,13 @@ res_his_Server <- function(id , parent){
 
                             
                         )
+
+                        )
+
+                        
                     })
 
-                    tags$div(
-
+                    tagList(
                         # recommendation history
                         recList,
 
@@ -139,7 +153,44 @@ res_his_Server <- function(id , parent){
                             label = "DUMMY button",
                             class = "sr-only"
                         ),
+                        
                     )
+
+                    # tags$div(
+
+                    #     # recommendation history
+                    #     recList,
+
+                    #     # javascript function to pass resId_자세히보기
+                    #     singleton(tags$script(HTML(glue(
+                    #         'function viewDetail(resId){
+                    #             Shiny.setInputValue(\"{{ns("modalResId")}}\", resId);
+                    #             document.getElementById(\"{{ns("dummyButtonViewDetail")}}\").click();
+                    #         }', .open = "{{", .close="}}"
+                    #     )))),
+
+                    #     # javascript function to pass resId_리뷰쓰기
+                    #     singleton(tags$script(HTML(glue(
+                    #         'function viewReview(resId){
+                    #             Shiny.setInputValue(\"{{ns("ReviewResId")}}\", resId);
+                    #             document.getElementById(\"{{ns("dummyButtonReview")}}\").click();
+                    #         }', .open = "{{", .close="}}"
+                    #     )))),
+
+                    #     # dummy button
+                    #     ##자세히보기 버튼
+                    #     actionButton(
+                    #         inputId = ns("dummyButtonViewDetail"),
+                    #         label = "DUMMY button",
+                    #         class = "sr-only"
+                    #     ),
+                    #     ##리뷰쓰기 버튼
+                    #     actionButton(
+                    #         inputId = ns("dummyButtonReview"),
+                    #         label = "DUMMY button",
+                    #         class = "sr-only"
+                    #     ),
+                    # )
                 })
             }
 
@@ -163,7 +214,7 @@ res_his_Server <- function(id , parent){
 
         #리뷰쓰기
         observeEvent(input$dummyButtonReview,{   
-            go_review_server(session = parent ,review_res_id = as.integer(input$ReviewResId) )
+            go_review_server(session = parent, review_res_id = as.integer(input$ReviewResId) )
         })
     })
 }

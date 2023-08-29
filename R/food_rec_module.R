@@ -2,46 +2,41 @@
 food_rec_UI <- function(id){
     ns <- NS(id)
     
-    fluidPage(
+    fluidRow(
         id = id,
-        fluidRow(
-            
-            tags$span(style = "text-align: center;",
-                uiOutput(ns("res_name"))
-            ),
-            tags$div(style = "text-align: center;",
-                actionButton(
-                    inputId = ns("refreshButton"), 
-                    label = NULL,
-                    icon = icon("refresh", class = "refresh-icon"),
-                    class = "my-button mt-2 mb-2",  
-                )
-            ),
-            tags$span(
-                uiOutput(ns("res_category"))
-            ),
-            tags$span(
-                uiOutput(ns("rec_menu"))
-            ),
-            tags$span(
-                class = "space"
-            ),
-            tags$span(
-                tags$h4( 
-                    actionLink(inputId = ns("rec_modal") , label = "자세히보기")
-                )   
-            ),
-            tags$span(
-                tags$h4( 
-                    actionLink(
-                        inputId = ns("go_review"),
-                        label = "리뷰쓰기"
-                    )
-                )   
+        tags$h1(
+            style = "text-align: center; margin-bottom : 5px; font-weight: bold;",
+            textOutput(ns("res_name"))
+        ),
+        tags$div(style = "text-align: center;",
+            actionButton(
+                inputId = ns("refreshButton"), 
+                label = NULL,
+                icon = icon("refresh", class = "refresh-icon"),
+                class = "my-button mt-2 mb-4",  
             )
-           
-            
-                
+        ),
+        tags$h6(
+            uiOutput(ns("res_category"))
+        ),
+        tags$span(
+            uiOutput(ns("rec_menu"))
+        ),
+        tags$span(
+            class = "space"
+        ),
+        tags$span(
+            tags$h4( 
+                actionLink(inputId = ns("rec_modal") , label = "자세히보기")
+            )   
+        ),
+        tags$span(
+            tags$h4( 
+                actionLink(
+                    inputId = ns("go_review"),
+                    label = "리뷰쓰기"
+                )
+            )   
         )
     )
 }
@@ -88,7 +83,7 @@ food_rec_Server <- function(id, parent){
             # 추천음식점의 카테고리 출력
             rec_category <- df_res_row$category
             output$res_category <- renderUI({
-                tags$h6("카테고리 : ", rec_category , style = "font-size:15px;")
+                tags$h6("카테고리 : ", rec_category , style = "font-size:15px; margin-bottom:0px;")
             })
 
             # 추천음식점의 메뉴 출력
@@ -133,8 +128,8 @@ food_rec_Server <- function(id, parent){
 
         # 초기화면에서 추천음식점 출력 ------------------------------------------------------------------------ #
         # [new way]
-        output$res_name <- renderUI({
-            tags$h1( resName() )
+        output$res_name <- renderText({
+            resName() 
         })
         
         # 추천 레스토랑 정보 from DB

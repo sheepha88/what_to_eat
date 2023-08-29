@@ -27,7 +27,7 @@ server <- function(input, output, session) {
 	Admin_Server("Admin", db_table = db_table)
 
 	#HOME tab_server
-	food_rec_Server("food_rec", parent = session)
+	food_rec_Server("food_rec", parent = session , db_table = db_table)
 	week_his_Server("week_his")
 	res_his_Server("res_his", parent = session)
 
@@ -36,7 +36,7 @@ server <- function(input, output, session) {
 	search_Server("Search")
 
 	#reivew , 평점 tab_server
-	review_Server("Review"  , parent = session)
+	review_Server("Review"  , parent = session, db_table = db_table)
 
 }
 

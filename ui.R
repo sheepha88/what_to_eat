@@ -78,7 +78,9 @@ ui <- fluidPage(
             title = "What to eat",
             
             #Home page
-            tabPanel("Home",
+            tabPanel(
+                title = "Home",
+                value = "home",
                 home_UI("Home")
             ),
             tabPanel("음식점 검색",

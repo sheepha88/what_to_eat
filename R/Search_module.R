@@ -4,11 +4,11 @@ search_UI <- function(id){
     fluidPage(
         id = id,
         class = "bg-white",
-        
+        style = "display: flex; justify-content: center; align-items: center;",
         fluidRow(
             # style = "width: 500px; background : white; border:2px solid #E8EBEE; border-radius: 10px;",
             class = "bg-white",
-            style = "border:2px solid #E8EBEE; border-radius: 10px; ",
+            style = "width: 500px; border:2px solid #E8EBEE; border-radius: 10px; ",
             tags$h3(
                 HTML("&nbsp;음식점 검색") ,
                 style = "font-weight: bold;",
@@ -20,7 +20,7 @@ search_UI <- function(id){
                 selectInput(
                     inputId = ns("name") , 
                     label = NULL , 
-                    width = "95%",
+                    width = "100%",
                     choices = NULL,
                     selected = NULL,
                     multiple = TRUE
@@ -29,12 +29,16 @@ search_UI <- function(id){
             fluidRow(
                 class = "part_line",
                 tags$h5("카테고리", class = "mt-2 mb-3"),
-                checkboxGroupInput(
-                    inputId = ns("category") , label = NULL,
-                    choices = c("한식", "양식", "일식", "중식", "배달" , "기타"),
-                    selected = NULL 
+                tags$div(
+                    checkboxGroupInput(
+                        inputId = ns("category") , label = NULL,
+                        choices = c("한식", "양식", "일식", "중식", "배달" , "기타"),
+                        selected = NULL ,
+                        width = "100%",
+                        inline = TRUE
+                    ),
+                     style = "font-size: 15px;" 
                 )
-                
             ),
             fluidRow(
                 class = "part_line",
@@ -45,7 +49,7 @@ search_UI <- function(id){
                 selectInput(
                     inputId = ns("menu") , 
                     label = NULL , 
-                    width = "95%",
+                    width = "100%",
                     choices = NULL,
                     selected = NULL,
                     multiple = TRUE
@@ -57,19 +61,19 @@ search_UI <- function(id){
                     tags$div(style = "font-size : 13px;",
                     checkboxGroupInput(inputId = ns("score"), label = NULL ,  choices = c("TI" , "네이버") , inline=TRUE , selected = NULL )
                     ),
-                sliderInput(inputId = ns("score_range") , label = NULL , min = 0L , max = 5L , value=c(0L,0L) , step = 0.5L, width = "95%")    
+                sliderInput(inputId = ns("score_range") , label = NULL , min = 0L , max = 5L , value=c(0L,0L) , step = 0.5L, width = "100%")    
                 )
             ),
             fluidRow(
                 class = "part_line",
                 tags$h5("가격", class = "mt-2 mb-3",
-                sliderInput(inputId = ns("price_range") , label = NULL , min = 0L , max = 50000L , value=0L , step = 1000L, width = "95%")
+                sliderInput(inputId = ns("price_range") , label = NULL , min = 0L , max = 50000L , value=0L , step = 1000L, width = "100%")
                 )
             ),
             fluidRow(
                 class = "part_line",
                 tags$h5("위치(m)", class = "mt-2 mb-3",
-                sliderInput(inputId = ns("distance_range") , label = NULL , min = 0L , max = 2000L , value=0L , step = 100L, width = "95%")
+                sliderInput(inputId = ns("distance_range") , label = NULL , min = 0L , max = 2000L , value=0L , step = 100L, width = "100%")
                 )
             ),
             fluidRow(

@@ -1,132 +1,137 @@
 # UI --------------------------------------------------------------------------------------------- #
-review_UI <- function(id ){
+review_UI <- function(id){
     ns <- NS(id)
     fluidPage(
         id = id,
-        tags$div(style = "display: flex; justify-content: center; align-items: center;",  # 가운데 정렬 스타일 적용
-            fluidRow(style = "width: 500px; background : white; border:2px solid #E8EBEE; border-radius: 10px;",
-                tags$h3(HTML("&nbsp;평점 & 리뷰작성") , style = "font-weight: bold;",class = "mt-2 mb-2"),
+        class = "bg-white",
+        style = "display: flex; justify-content: center; align-items: center;",
+        fluidRow(
+            # style = "width: 500px; background : white; border:2px solid #E8EBEE; border-radius: 10px;",
+            class = "bg-white",
+            style = "width: 500px; border:2px solid #E8EBEE; border-radius: 10px; ",
+            tags$h3(
+                HTML("&nbsp;평점 & 리뷰작성") , 
+                style = "font-weight: bold;",
+                class = "mt-2 mb-2"
+            ),
+            fluidRow(
+                class = "part_line",
+                # tags$h5("음식점 선택", class = "mt-2 mb-2" ),
+                # fluidRow(
+                #     column(
+                #         width = 12,
+                #         selectInput(
+                #             inputId = ns("review_res_list") , 
+                #             label = NULL,
+                #             choices = NULL,
+                #             selected = NULL,
+                #         )
+                #     )
+                # ),
+                tags$h4(
+                    textOutput(outputId = ns("review_res_name_output")),
+                    style = "text-align:center;"
+                )
+            ),
+            fluidRow(
+                class = "part_line",
+                tags$h5("방문일", class = "mt-2 mb-2" ),
+                dateInput(
+                    inputId = ns("date_visit"),
+                    label = NULL,
+                    value = NULL,
+                    format = "yyyy-mm-dd",
+                    width = "100%"
+                )
+                
+            ),
+            fluidRow(
+                class = "part_line",
+                tags$h5("참석자", class = "mt-2 mb-2" ),
+                selectInput(
+                    inputId = ns("participants") , 
+                    label = NULL , 
+                    choices = NULL,
+                    selected = NULL,
+                    multiple = TRUE,
+                    width = "100%"
+                )
+            ),
+            fluidRow(
+                class = "part_line",
+                tags$h5("평점", class = "mt-2 mb-0" ),
                 tags$div(
-                    class = "part_line",
-                    fluidRow(
-                        column(
-                            width = 12,
-                            tags$h4(
-                                textOutput(outputId = ns("review_res_name_output")),
-                                style = "text-align:center;"
-                            )
-                        )
-                    )
+                    class = "text-center",  
+                    shinyRatings(inputId = ns("star"), default = 3)
                 ),
                 tags$div(
-                    class = "part_line",
-                    fluidRow(
-                        column(
-                            width = 3,
-                            style = "margin-top:5px ;",
-                            "방문일"
-                        ),
-                        column(
-                            width = 9,
-                            dateInput(inputId = ns("date_visit") , label = NULL , value = NULL , format = "yyyy-mm-dd")
-                        )
-                    ),
-                    fluidRow(
-                        column(
-                            width = 3,
-                            style = "margin-top:5px ;",
-                            "참석자"
-                        ),
-                        column(
-                            width = 9,
-                            selectInput(
-                                inputId = ns("participants") , 
-                                label = NULL , 
-                                choices = NULL,
-                                selected = NULL,
-                                multiple = TRUE
-                            )
-                        )
-                    ),
-                    fluidRow(
-                        column(
-                            width = 3,
-                            style = "margin-top:12px ;",
-                            "평점"
-                        ),
-                        column(
-                            width = 9,
-                            shinyRatings(inputId = ns("star"),default = 3),
-                            textOutput(outputId = ns('star_rating'))
-                        )
-                    ),
-                    fluidRow(style = "margin-top:5px ;",
-                        column(
-                            width = 3,
-                            "리뷰"
-                        ),
-                        column(
-                            width = 9,
-                            textAreaInput(
-                                inputId = ns("review_area") ,
-                                label = NULL ,
-                                value = "",
-                                width = "300px",
-                                height = "200px"
-                            )
-                        )
-                    ),
-                    fluidRow(
-                        column(
-                            width = 3,
-                            "사진 첨부"
-                        ),
-                        column(
-                            width = 9,
-                            actionButton(
-                                inputId = ns("add"),
-                                label = "ADD",
-                                icon = icon("plus" , class = "me-1"),
-                                class="btn btn-outline-secondary btn-sm",
-                                width = "80px",
-                                style = "margin-right:10px;"
-                            ),
-                            actionButton(
-                                inputId = ns("delete"),
-                                label = "DELETE",
-                                icon = icon("minus" , class = "me-1"),
-                                class="btn btn-outline-secondary btn-sm",
-                                width = "90px",
-                                style = "margin-right:10px;"
-                            ),
-                            actionButton(
-                                inputId = ns("reset"),
-                                label = "RESET",
-                                icon = icon("refresh" , class = "me-1"),
-                                class="btn btn-outline-secondary btn-sm",
-                                width = "100px"
-                            ),
-                            fluidRow(
-                                column(
-                                    width = 10,
-                                    class = "ms-2 mt-4 mb-3 border-top",
-                                    fluidRow(
-                                        id = "here",
-                                        class = "mt-4"
-                                    )
-                                )
-                            )
-                        )
-                    ),
-                    fluidRow(style = "justify-content: center;",
-
+                    class = "text-center",
+                    textOutput(outputId = ns('star_rating'))
+                )
+            ),
+            fluidRow(
+                class = "part_line",
+                tags$h5("리뷰", class = "mt-2 mb-2" ),
+                textAreaInput(
+                    inputId = ns("review_area") ,
+                    label = NULL ,
+                    value = "",
+                    width = "100%",
+                    height = "200px"
+                )
+                
+            ),
+            fluidRow(
+                class = "part_line",
+                tags$h5("사진 첨부", class = "mt-2 mb-2" ),
+                    tags$div(
+                        style = "display: flex;",
                         actionButton(
-                            inputId = ns("upload") , 
-                            label = "Upload",
-                            style = "margin-bottom : 20px; ",
-                            width = "100px",
-                            class="btn btn-success"
+                            inputId = ns("add"),
+                            label = "ADD",
+                            icon = icon("plus" , class = "me-1"),
+                            class = "btn btn-outline-secondary btn-sm",
+                            width = "100%",
+                            style = "margin-right: 10px;"
+                        ),
+                        actionButton(
+                            inputId = ns("delete"),
+                            label = "DELETE",
+                            icon = icon("minus" , class = "me-1"),
+                            class = "btn btn-outline-secondary btn-sm",
+                            width = "100%",
+                            style = "margin-right: 10px;"
+                        ),
+                        actionButton(
+                            inputId = ns("reset"),
+                            label = "RESET",
+                            icon = icon("refresh" , class = "me-1"),
+                            class = "btn btn-outline-secondary btn-sm",
+                            width = "100%"
                         )
+                    ),
+                    tags$div(
+                        id = "here",
+                        class = "mt-4"
+                    )
+            ),
+            fluidRow(
+                class = "part_line",
+                tags$div(
+                    class = "btn-group",
+                    role = "group",
+                    
+                    actionButton(
+                        inputId = ns("upload") , 
+                        label = "Upload",
+                        width = "100px",
+                        class="btn btn-success mb-4 me-1"
+                    ),
+                    actionButton(
+                        inputId = ns("go_to_home"),
+                        label = "Back to Home",
+                        width = "100px",
+                        class = "btn-dark mb-4"
                     )
                 )
             )
@@ -136,7 +141,7 @@ review_UI <- function(id ){
 
 
 # server ----------------------------------------------------------------------------------------- #
-review_Server <- function(id , parent ){
+review_Server <- function(id, parent, db_table){
     moduleServer(id , function(input , output , session){
         ns <- session$ns
 
@@ -147,9 +152,46 @@ review_Server <- function(id , parent ){
         dbTable <- session$userData[["dbTable"]]
 
 
+        #음식점 리스트 
+        observeEvent(parent$input$navbarPage, {
+
+            req(parent$input$navbarPage == "rating", db_table())
+
+            ### 음식점 리스트 받기 from DB
+            res_list <- c("", as.character(db_table()$res$id))
+            names(res_list) <- c("", db_table()$res$res_name)
+
+            ### 음식점 선택 UI 업데이트: 리스트 추가
+            # updateSelectInput(
+            #     inputId = "review_res_list",
+            #     choices = res_list
+            # )
+
+        })
+
+
         #음식점이름 출력
         res_id <- reactiveVal()
-        observeEvent(session$userData[["review_res_id"]](),{
+        observeEvent(session$userData[["review_res_id"]](), {
+
+            # print(session$userData[["review_res_id"]]())
+            # print(db_table()$res)
+
+            # req( db_table(), session$userData[["review_res_id"]]() %in% db_table()$res$id )
+
+            # cat("-\n")
+            # print(session$userData[["review_res_id"]]())
+            
+            # ### 음식점 리스트 받기 from DB
+            # res_list <- c("", as.character(db_table()$res$id))
+            # names(res_list) <- c("", db_table()$res$res_name)
+            
+            # ### 음식점 선택 UI 업데이트: 선택 추가
+            # updateSelectInput(
+            #     inputId = "review_res_list",
+            #     choices = res_list,
+            #     selected = as.character( session$userData[["review_res_id"]]() )
+            # )
             
             res_id(session$userData[["review_res_id"]]())
 
@@ -226,5 +268,16 @@ review_Server <- function(id , parent ){
             # step3: send query to MySQL
             dbExecute(con, sql_script)
         })
+
+        #홈으로 가기
+        observeEvent(input$go_to_home, {
+            updateNavbarPage(
+                session = parent,
+                inputId = "navbarPage",
+                selected = "home"
+            )
+        })
+
+
     })
 }
