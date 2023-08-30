@@ -19,8 +19,10 @@ res_his_Server <- function(id , parent){
         #새로고침 버튼 누르면 , 출력
         observeEvent(session$userData[["refreshClicked"]](), {
 
+            req(session$userData[["user_id"]]()!=0L)
+
             #Recommend table 출력 후 행개수 추출
-            user_id <- session$userData[["user_id"]]
+            user_id <- session$userData[["user_id"]]()
             sql_his_1 <- glue("
                 SELECT A.res_id, A.created, A.user_id, B.res_name, B.category, JSON_KEYS(B.menu) menu
                 FROM recommend A

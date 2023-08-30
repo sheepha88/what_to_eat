@@ -1,0 +1,43 @@
+@import url(//fonts.googleapis.com/earlyaccess/nanumgothic.css);
+
+body{
+    font-family: "Lato", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+.login-img{
+    margin-top: 20px; 
+    margin-bottom: 20px; 
+    max-width: 350px; 
+    width: 80%; 
+    height: auto
+}
+
+.panel-border{
+    border: solid #1A2421 2px;
+    border-radius: 25px;
+}
+
+.border-end{
+    border-right: solid 1px #2c3e50;
+}
+
+.account-link{
+    font-size: 1.4rem;
+    color:#2c3e50;
+    text-decoration: underline;
+}
+
+.account-link:hover{
+    color:#2c3e50;
+}
+
+.account-link:focus {
+    color:#2c3e50;
+}
+
+.required label:after {
+    content: " *";
+    color: #dc3545;
+    display: inline;
+    font-weight: bold;
+  }

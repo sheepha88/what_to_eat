@@ -134,17 +134,13 @@ food_rec_Server <- function(id, parent , db_table){
         
         # 추천 레스토랑 정보 from DB
         observeEvent(db_table(),{
-            print("ghkrdls")
-            req(db_table())
+            
+            req(db_table(), session$userData[["user_id"]]() != 0L)
             res_info <- recommendRestaurant(db_table)
-            print(res_info)
             recommend_res_info(res_info)
-            print("확인")
-            print(recommend_res_info())
             created <- lubridate::now() |> format(x =_, "%Y-%m-%d %H:%M:%S.%S3")
-            user_id <- session$userData[["user_id"]]
+            user_id <- session$userData[["user_id"]]()
             res_id <-  recommend_res_info()$res_id
-            print(res_id)
 
             # step2: script 생성
             sql_script <- glue("
@@ -175,7 +171,7 @@ food_rec_Server <- function(id, parent , db_table){
         
         # 새로고침 버튼 클릭 시, 출력 ----------------------------------------------------------------------- 
         observeEvent(input$refreshButton,{
-            req(input$refreshButton)
+            req(input$refreshButton, session$userData[["user_id"]]() != 0L)
             
             # 추천음식점 기록
             # 추천음식점 출력 함수 반환값 변수지정
@@ -197,7 +193,7 @@ food_rec_Server <- function(id, parent , db_table){
             # #새로고침 누르면 DB(recommend table)에 전 추천음식점 정보 업로드
             # step1: column value 생성
             created <- as.character(Sys.time()) # lubridate::now() |> format(x =_, "%Y-%m-%d %H:%M:%S.%S3")
-            user_id <- session$userData[["user_id"]]
+            user_id <- session$userData[["user_id"]]()
             res_id <-  recommend_res_info()[["res_id"]]
 
             # step2: script 생성

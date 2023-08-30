@@ -1,0 +1,8 @@
+default:
+  db:
+    dbname: what_to_eatDB
+    username: root
+    password: 0000
+    host: 127.0.0.1
+    port: 3306
+

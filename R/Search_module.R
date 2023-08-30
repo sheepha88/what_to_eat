@@ -57,9 +57,9 @@ search_UI <- function(id){
             ),
             fluidRow(
                 class = "part_line",
-                tags$h5("평점", class = "mt-2 mb-3",
+                tags$h5("평점 (네이버)", class = "mt-2 mb-3",
                     tags$div(style = "font-size : 13px;",
-                    checkboxGroupInput(inputId = ns("score"), label = NULL ,  choices = c("TI" , "네이버") , inline=TRUE , selected = NULL )
+                    # checkboxGroupInput(inputId = ns("score"), label = NULL ,  choices = c("TI" , "네이버") , inline=TRUE , selected = NULL )
                     ),
                 sliderInput(inputId = ns("score_range") , label = NULL , min = 0L , max = 5L , value=c(0L,0L) , step = 0.5L, width = "100%")    
                 )
@@ -100,25 +100,23 @@ search_UI <- function(id){
 
 
 # server ----------------------------------------------------------------------------------------- #
-search_Server <- function(id){
+search_Server <- function(id , db_table){
     moduleServer(id , function(input , output , session){
         ns <- session$ns
-        reactive_dbTable <- reactiveVal(NULL)
-        reactive_dbTable(session$userData[["dbTable"]])
-
-
-        #dbtable 가져오기
-        dbTable <- session$userData[["dbTable"]]
-
-        #db table 중 res table에서 음식점 이름 가져오기
-        res_name_choices <- dbTable$res$res_name
-
-        #db table 중 res table에서 메뉴 가져와서 json 형태로 변환 후 vector로 변환
-        res_menu <- unlist(menuToList(dbTable$res))
-
 
         #테이블 업데이트 되면 검색팝업도 업데이트
-        observeEvent(reactive_dbTable() , {
+        observeEvent(db_table() , {
+            
+            #dbtable 가져오기
+            dbTable <- db_table()
+
+            #db table 중 res table에서 음식점 이름 가져오기
+            res_name_choices <- dbTable$res$res_name
+
+            #db table 중 res table에서 메뉴 가져와서 json 형태로 변환 후 vector로 변환
+            res_menu <- unlist(str_split(menuToList(dbTable$res) , "," ))
+            # print(unlist(str_split(menuToList(dbTable$res) , "," )))
+
             #음식점 검색
             updateSelectInput(
                 inputId = "name" , 
@@ -136,13 +134,13 @@ search_Server <- function(id){
         observeEvent(input$Done_search,{
 
             #데이터프레임 선언
-            df_res <- dbTable$res
+            df_res <- db_table()$res
 
             #df_res의 메뉴컬럼 -> 메뉴 , 가격(평균)으로 만들기
             ##메뉴 json -> 리스트
-            df_res$menu <- menuToList(dbTable$res) 
+            df_res$menu <- menuToList(db_table()$res) 
             ##가격 json -> 리스트
-            df_res$price <- priceToList(dbTable$res)
+            df_res$price <- priceToList(db_table()$res)
             
             df_result <- df_res%>% filter(
                                     ifelse(is.null(input$name) , TRUE , FALSE) | res_name %in% input$name

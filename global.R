@@ -1,29 +1,37 @@
 # ------------------------------------------------------------------------------------------------ #
 # 글로벌 옵션                                                                                           #
 # ------------------------------------------------------------------------------------------------ 션
-options(digits.secs = 6)  
+options(
+    digits.secs = 6,
+    scipen = 999,
+    shiny.maxRequestSize=15*1024^2
+)  
 
 # ------------------------------------------------------------------------------------------------ #
 # library                                                                                          #
 # ------------------------------------------------------------------------------------------------ #
-library(shinyjs)
-library(shiny)
-library(glue)
-library(RMySQL)
-library(DBI)
-library(data.table)
-library(jsonlite)
-library(rjson)
-library(bslib)
-library(lubridate)
-library(dplyr)
-library(DT)
-library(shinyBS)
-library(shinyRatings)
-library(shinymanager)
-library(toastui)
-library(stringr)
-
+suppressPackageStartupMessages({
+    library(shinyjs)
+    library(shiny)
+    library(glue)
+    library(RMySQL)
+    #library(DBI)
+    library(data.table)
+    library(jsonlite)
+    library(rjson)
+    library(bslib)
+    library(lubridate)
+    library(dplyr)
+    library(DT)
+    library(shinyBS)
+    library(shinyRatings)
+    library(shinymanager)
+    library(toastui)
+    library(stringr)
+    library(pool)
+    library(config)
+    library(shinyFeedback)
+})
 # ------------------------------------------------------------------------------------------------ #
 # mysql connect                                                                                    #
 # ------------------------------------------------------------------------------------------------ #
@@ -31,6 +39,17 @@ library(stringr)
 # RMySQL connect --------------------------------------------------------------------------------- #
 
 ## setup connection
+db <- config::get(file = "config.yml")$db
+# con <- dbPool(
+#     RMySQL::MySQL(),
+#     dbname = db$dbname,
+#     host = db$host,
+#     username = db$username,
+#     password = db$password,
+#     port = db$port
+# )
+
+
 con <- dbConnect(
   RMySQL::MySQL(), 
   user="root", 
@@ -60,6 +79,66 @@ onStop(function() {
   dbDisconnect(con)
   # poolClose(con)
 })
+
+# onStop(function() {
+#     cat("Closing App & Database Connection\n")
+#     poolClose(con)
+# })
+
+# ------------------------------------------------------------------------------------------------ #
+# login page setup                                                                                 #
+# ------------------------------------------------------------------------------------------------ #
+set_labels(
+    language = "en",
+    "Please authenticate" = "",
+    "Login" = "로그인",
+    "Username:" = "이메일",
+    "Password:" = "비밀번호"
+)
+
+# ------------------------------------------------------------------------------------------------ #
+# check credentials                                                                                #
+# ------------------------------------------------------------------------------------------------ #
+checkCredentials <- function(){
+    
+    function(user, password){
+        
+        # write up sql script
+        sql_script <- glue("SELECT * FROM user WHERE approved = 1 AND email = '{user}' AND password = SHA('{password}');")
+        
+        # execute the script
+        sql_result <- tryCatch(
+            { dbGetQuery(con, sql_script) },
+            error = function(err){
+                msg <- "Database Connection Error: Fail to access to 'user' table"
+                # print `msg` so that we can find it in the logs
+                message(msg)
+                # print the actual error to log it
+                message(err)
+                # show error `msg` to user.  User can then tell us about error and we can
+                # quickly identify where it came from based on the value in `msg`
+                return(NULL)
+            }
+        )
+
+        # check validity of the user email address requested
+        if ( nrow(sql_result) == 1L ){
+            
+            sel_cols <- c("id", "email", "username", "sys_role")
+            setDT(sql_result)
+           
+
+            list( result = TRUE, user_info = as.list( sql_result[, sel_cols, with = FALSE] ) )
+        
+        }else{
+            list(result = FALSE)
+        }
+
+    }
+
+}
+
+
 
 # ------------------------------------------------------------------------------------------------ #
 # utility functions                                                                                #
@@ -206,21 +285,36 @@ modal_ui_file <- function(session , rec_res_id){
                         select(rating_TI , comment , username)
     
     #TI 평정
-    mean_score <- round(mean(as.numeric(df_TI_review$rating_TI) ),1)
-
-    reviewTags <- lapply(seq(nrow(df_TI_review)) , function(x){
-        tags$div(class = "part_line",
-            tags$div(style = " font-weight: bold;",
-                df_TI_review[x , "username"]
-            ),
-            tags$div(
-                "이미지.jpg"
-            ),
-            tags$div(
-                df_TI_review[x, "comment"]
-            )
+    mean_score <- ifelse(
+            nrow(df_TI_review)==0,
+            "평점 없음",
+            round(mean(as.numeric(df_TI_review$rating_TI) ),1)
         )
-    })
+    
+
+
+
+    
+    reviewTags <- if(nrow(df_TI_review)!=0){
+                        lapply(rev(seq(nrow(df_TI_review))) , function(x){
+                            fluidRow(class = "part_line",
+                                tags$h4(style = " font-weight: bold;",
+                                    df_TI_review[x , "username"]
+                                ),
+                                tags$h4(
+                                    icon("star" , style="color: gold;"),
+                                    df_TI_review[x , "rating_TI"]
+                                ),
+                                tags$h4(
+                                    df_TI_review[x, "comment"]
+                                )
+                            )
+                        })
+                    }else {
+                    tags$div(
+                            "리뷰 없음"
+                        )
+                    }
 
     #리뷰 출력
     modalDialog(
@@ -228,51 +322,30 @@ modal_ui_file <- function(session , rec_res_id){
         tags$style(".modal-title { font-size: 30px; }"),
         fluidPage(
             fluidRow(
-                column(
-                    width = 12,
-                    tags$h4(name)
-                )
+                tags$h5(name , style = "font-weight: bold;")
             ),
             fluidRow(
-                column(
-                    width = 12,
-                    tags$h4("카테고리 : ",category)
-                )
+                tags$h4("카테고리 : ",category)
             ),
             fluidRow(
-                column(
-                    width = 12,
-                    tags$h4("메뉴 : ",menu)
-                )
+                tags$h4("메뉴 : ",menu)
             ),      
             fluidRow(
-                column(
-                    width = 12,
-                    tags$div(style = "display: flex;",
-                        tags$span(
-                            tags$h4("네이버 평점 : ",rating_naver)
-                        ),
-                        tags$span(style = "margin-left:3px; margin-top:11px;",
-                            tags$a(
-                                href = HTML(url),
-                                target = "_blank",
-                                "네이버 바로가기"
-                            )
-                        )
+                tags$h4(
+                    "네이버 평점 : ", 
+                    rating_naver,
+                    tags$a(
+                        href = url,
+                        target = "_blank",
+                        "네이버 바로가기"
                     )
                 )
             ),      
             fluidRow(
-                column(
-                    width = 12,
-                    tags$h4("가격(평균) : ",price , "원")
-                )
+                tags$h4("가격(평균) : ",price , "원")
             ),      
             fluidRow(
-                column(
-                    width = 12,
-                    tags$h4("위치(회사기준) : ",distance , "m")
-                )
+                tags$h4("위치(회사기준) : ",distance , "m")
             ),            
             fluidPage(
                 style = "background-color : #FAFBFC;",
@@ -283,7 +356,7 @@ modal_ui_file <- function(session , rec_res_id){
                 fluidRow(
                     column(
                         width = 10,
-                        tags$h4("평점(TI) : " , mean_score)
+                        tags$h4("평점(TI) : " , icon("star" , style="color: gold;") ,mean_score)
                     )
                 ),
                 fluidRow(

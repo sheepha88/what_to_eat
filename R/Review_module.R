@@ -261,8 +261,10 @@ review_Server <- function(id, parent, db_table){
         observeEvent(input$yes , {
             removeModal()
 
+            req(session$userData[["user_id"]]() != 0L)
+
             res_id <- as.integer(input$review_res_list)
-            user_id <- session$userData[["user_id"]]
+            user_id <- session$userData[["user_id"]]()
             visit_date <- as.Date(input$date_visit)
             participants <- paste(input$participants , collapse =  ",")
             rating_TI <- as.numeric(input$star)

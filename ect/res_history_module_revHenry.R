@@ -20,9 +20,11 @@ res_his_Server <- function(id){
         df <- data.table("res_name" = NULL , "category" = NULL , "menu" = NULL)
         #새로고침 버튼 누르면 , 출력
         observeEvent(session$userData[["refreshClicked"]](), {
+
+            req(session$userData[["user_id"]]() != 0L)
             
             #Recommend table 출력 후 행개수 추출
-            user_id <- session$userData[["user_id"]]
+            user_id <- session$userData[["user_id"]]()
             sql_his_1 <- glue("select * from recommend where user_id = {user_id} order by id;")
             df_his <- dbGetQuery(con, sql_his_1) |> data.table() #
             cnt<- nrow(df_his) |> as.integer() #행개수 추출
