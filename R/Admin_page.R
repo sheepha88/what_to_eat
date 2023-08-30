@@ -263,7 +263,7 @@ Admin_Server <- function(id, db_table){
             
             #MySQL 쿼리 작성
             static_rows_num <- paste0(del_target_ids, collapse = ",")
-            sql_script <- glue("UPDATE res SET deleted = 0 WHERE id IN ({static_rows_num});")
+            sql_script <- glue("UPDATE res SET deleted = 1 WHERE id IN ({static_rows_num});")
 
             #MySQL에서 쿼리 실행
             sql_result <- tryCatch(

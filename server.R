@@ -223,6 +223,7 @@ server <- function(input, output, session) {
 	# shiny app server ------------------------------------------------------------------------------ #
 	
 	# 로그인 정보 획득
+    
 	observeEvent(input$shinymanager_where, {
 		
 		req(input$shinymanager_where == "application")
@@ -231,9 +232,12 @@ server <- function(input, output, session) {
 
 		if ( login_info$sys_role == "admin" ){
 			showTab(inputId = "navbarPage", target = "admin")
-            		
+            shinyjs::show("hidden_admin_page")
+            
+
 		}else{
 			hideTab(inputId = "navbarPage", target = "admin")
+            
 		}
 
 
@@ -333,8 +337,8 @@ server <- function(input, output, session) {
         )
     })
 
-    observeEvent(input$go_to_admin, {
-        req(input$go_to_admin)
+    observeEvent(input$hidden_admin_page, {
+        req(input$hidden_admin_page)
         updateTabsetPanel(
             session = session,
             inputId = "navbarPage",

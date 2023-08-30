@@ -204,8 +204,8 @@ getDBTable <- function(){
 
     
     # 음식점  테이블 출력
-    #deleted = 1 : admin page에서 삭제처리하지 않은 것만 추출
-    sql_res <- "SELECT * FROM res WHERE deleted = 1;"
+    #deleted = 0 : admin page에서 삭제처리하지 않은 것만 추출
+    sql_res <- "SELECT * FROM res WHERE deleted = 0;"
     df_res <- dbGetQuery(con, sql_res) |> data.table()
     
     # 사용자 테이블 출력

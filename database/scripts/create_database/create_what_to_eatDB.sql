@@ -1,0 +1,1 @@
+CREATE DATABASE what_to_eatDB default CHARACTER SET utf8mb4 default COLLATE utf8mb4_unicode_ci;

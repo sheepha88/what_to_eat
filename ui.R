@@ -106,6 +106,16 @@ ui <- fluidPage(
         )
     ),
     fluidRow(
+        
+        tags$div(
+            style = "background-color : #FAFBFC;",
+            actionButton(
+                inputId = "hidden_admin_page",
+                label = "Admin Page",
+                style = "display:none;",
+                class = "mx-3 mt-3 btn-outline-dark "
+            )
+        ),
         tags$div(
             style = "background-color : #FAFBFC;",
             class = "navbar_class",
