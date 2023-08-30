@@ -166,7 +166,8 @@ review_Server <- function(id, parent, db_table){
             )
 
             ## 참석자 리스트
-            participants_list <- db_table()$user$username
+            participants_vec <- db_table()$user$username
+            participants_list <- participants_vec[ ! participants_vec %in% "관리자"]
             updateSelectInput(
                 inputId = "participants" , 
                 choices = participants_list

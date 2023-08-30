@@ -350,7 +350,8 @@ modal_ui_file <- function(session , rec_res_id){
             fluidPage(
                 style = "background-color : #FAFBFC;",
                 class = "border",
-                tags$h3(class = "part_line",
+                tags$h3(
+                    style = "margin-top:5px;",
                     "TI history"
                 ),
                 fluidRow(

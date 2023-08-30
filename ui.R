@@ -19,12 +19,10 @@ ui <- fluidPage(
     tags$style(
         HTML("
             .custom-font {
-            font-size: 60px;
-            font-family: 'French Script MT';
-            font-weight: bold;
+            border: none;
+            outline: none;
             text-align: center;
             background-color: #00BFE5;
-            margin: 0;
             }
             .nav-container {
                 dislplay: flex;
@@ -95,11 +93,14 @@ ui <- fluidPage(
     # TITLE , Navbarpage ------------------------------------------------------------------------- #
     fluidRow(
         tags$h1(
-            actionLink(
-                inputId = "title",
-                label = "What to eat",
-                class  = "my-link-style",
-                disable = TRUE
+            tags$button(
+                id = "title",
+                class = "btn action-button",
+                tags$img(
+                    class = "img-fluid login-img mb-2",
+                    title = "logo",
+                    src = "what-to-eat-logo-wide.png"
+                ),style = "border-color: transparent;"
             ),
             class = "custom-font",
             position = "fixed-top"
